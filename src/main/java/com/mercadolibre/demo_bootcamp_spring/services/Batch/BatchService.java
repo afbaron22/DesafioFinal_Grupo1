@@ -33,18 +33,10 @@ public class BatchService implements IBatchService {
 
         var sizeBatch = getBatchSize(inboundOrderDTO);
         var section = saveSection(inboundOrderDTO,sizeBatch);
-        var batches = inboundOrderDTO.getBatchStock().stream().map(x-> returnBatch(x)).collect(Collectors.toList());
-        var newInboundOrder = new InboundOrder(inboundOrderDTO.getOrderNumber(),inboundOrderDTO.getOrderDate(),section,batches);
-        for(var item: batches){
-            item.setInboundOrder(newInboundOrder);
-        }
-        newInboundOrder.setBatches(batches);
+        var newInboundOrder = new InboundOrder(inboundOrderDTO.getOrderNumber(),inboundOrderDTO.getOrderDate(),section);
+        var batches = inboundOrderDTO.getBatchStock().stream().map(x-> returnBatch(x,newInboundOrder)).collect(Collectors.toList());
         inboundOrderRepository.save(newInboundOrder);
-
-        for(var item: batches){
-            batchRepository.save(item);
-        }
-        //batches.forEach(x->batchRepository.save(x));
+        batches.forEach(x->batchRepository.save(x));
         return newInboundOrder;
 
     }
@@ -58,14 +50,14 @@ public class BatchService implements IBatchService {
     }
 
     private Section saveSection(InboundOrderDTO inboundOrderDTO,Integer sizeBatch){
-        var section = new Section(inboundOrderDTO.getSection().getSectionCode(),"1",0,0,sizeBatch);
+        var section = new Section(null,inboundOrderDTO.getSection().getSectionCode(),"1",0,0,sizeBatch);
         sectionRepository.save(section);
         return section;
     }
 
-    private Batch returnBatch(BatchDTO batchDTO){
+    private Batch returnBatch(BatchDTO batchDTO,InboundOrder inboundOrder){
         var productTest =productsRepository.findById(batchDTO.getProductId()).orElseThrow();
-        var newBatch = new Batch(null,productTest,batchDTO.getCurrentTemperature(),batchDTO.getMinimumTemperature(),batchDTO.getDueDate(),batchDTO.getManufacturingDate(),batchDTO.getManufacturingTime(),batchDTO.getInitialQuantity(),batchDTO.getCurrentQuantity());
+        var newBatch = new Batch(null,productTest,batchDTO.getCurrentTemperature(),batchDTO.getMinimumTemperature(),batchDTO.getDueDate(),batchDTO.getManufacturingDate(),batchDTO.getManufacturingTime(),batchDTO.getInitialQuantity(),batchDTO.getCurrentQuantity(),inboundOrder);
         return newBatch;
     }
 

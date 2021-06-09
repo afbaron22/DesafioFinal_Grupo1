@@ -1,6 +1,7 @@
 package com.mercadolibre.demo_bootcamp_spring.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,18 +44,7 @@ public class Batch {
     private Integer currentQuantity;
 
     @ManyToOne
-    @JoinColumn(name = "FK_INBOUNDORDER", updatable = false, nullable = false)
+    @JoinColumn(name = "FK_INBOUNDORDER", updatable = false, nullable = true)
     private InboundOrder inboundOrder;
 
-    public Batch(String batchNumber, Product product, Float currentTemperature, Float minimumTemperature, LocalDate dueDate, LocalDate manufacturingDate, LocalDateTime manufacturingTime, Integer initialQuantity, Integer currentQuantity) {
-        this.batchNumber = batchNumber;
-        this.product = product;
-        this.currentTemperature = currentTemperature;
-        this.minimumTemperature = minimumTemperature;
-        this.dueDate = dueDate;
-        this.manufacturingDate = manufacturingDate;
-        this.manufacturingTime = manufacturingTime;
-        this.initialQuantity = initialQuantity;
-        this.currentQuantity = currentQuantity;
-    }
 }
