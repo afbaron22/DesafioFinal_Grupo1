@@ -1,20 +1,19 @@
-package com.mercadolibre.demo_bootcamp_spring.services.Batch;
+package com.mercadolibre.demo_bootcamp_spring.services;
 
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.BatchDTO;
 import com.mercadolibre.demo_bootcamp_spring.dtos.InboundOrderDTO;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
-import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.models.Section;
 import com.mercadolibre.demo_bootcamp_spring.repository.BatchRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
+import com.mercadolibre.demo_bootcamp_spring.services.Batch.IBatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
