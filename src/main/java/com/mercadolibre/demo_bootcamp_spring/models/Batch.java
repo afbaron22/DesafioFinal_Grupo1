@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class Batch {
     @Column(name="batchNumber")
     private String batchNumber;
 
-    @OneToOne()
+    @ManyToOne
     @JoinColumn(name = "FK_PRODUCT", updatable = false, nullable = false)
     private Product product;
 
@@ -41,6 +42,19 @@ public class Batch {
 
     private Integer currentQuantity;
 
+    @ManyToOne
+    @JoinColumn(name = "FK_INBOUNDORDER", updatable = false, nullable = false)
+    private InboundOrder inboundOrder;
 
-
+    public Batch(String batchNumber, Product product, Float currentTemperature, Float minimumTemperature, LocalDate dueDate, LocalDate manufacturingDate, LocalDateTime manufacturingTime, Integer initialQuantity, Integer currentQuantity) {
+        this.batchNumber = batchNumber;
+        this.product = product;
+        this.currentTemperature = currentTemperature;
+        this.minimumTemperature = minimumTemperature;
+        this.dueDate = dueDate;
+        this.manufacturingDate = manufacturingDate;
+        this.manufacturingTime = manufacturingTime;
+        this.initialQuantity = initialQuantity;
+        this.currentQuantity = currentQuantity;
+    }
 }

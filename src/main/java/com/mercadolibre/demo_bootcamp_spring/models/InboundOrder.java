@@ -1,6 +1,7 @@
 package com.mercadolibre.demo_bootcamp_spring.models;
 
 
+import com.mercadolibre.demo_bootcamp_spring.dtos.BatchDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,7 @@ public class InboundOrder {
     private Section section;
 
 
-    @OneToMany(mappedBy = "batchNumber")
+    @OneToMany(mappedBy = "inboundOrder")
     private List<Batch> batches;
-
 
 }

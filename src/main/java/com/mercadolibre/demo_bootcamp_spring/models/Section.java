@@ -13,9 +13,9 @@ import java.util.Stack;
 @Table(name="Sections")
 public class Section {
     @Id
-    @Enumerated(EnumType.ORDINAL)
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="sectionId")
+    private String id;
     private State state;
     private String warehouseCode;
     private Integer minSize;
