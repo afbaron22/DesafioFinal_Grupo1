@@ -3,6 +3,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class WarehouseService {
+
+
+
    /* @Autowired
     ProductsWarehouseRepository productsWarehouseRepository;
     @Autowired
