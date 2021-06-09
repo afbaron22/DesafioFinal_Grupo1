@@ -21,6 +21,6 @@ public class BatchController {
         if (bindingResult.hasErrors()) {
             throw new ValidationErrorException(bindingResult.getFieldError().getField(),bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return new ResponseEntity(service.getCertificado(estudiante), HttpStatus.OK);
+        return null;
     }
 }

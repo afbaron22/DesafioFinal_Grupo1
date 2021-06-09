@@ -2,7 +2,9 @@ package com.mercadolibre.demo_bootcamp_spring.services;
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.BatchDTO;
 import com.mercadolibre.demo_bootcamp_spring.dtos.InboundOrderDTO;
+import com.mercadolibre.demo_bootcamp_spring.dtos.OrderDTO;
 import com.mercadolibre.demo_bootcamp_spring.dtos.SectionDTO;
+import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.repository.OrdersRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.WarehouseRepository;
@@ -16,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class OrdersService {
+public class OrdersService implements IOrderService{
     @Autowired
     OrdersRepository ordersRepository;
     @Autowired
@@ -40,4 +42,20 @@ public class OrdersService {
         private List<BatchDTO> batchStock;*/
     }
 
+    //TODO implementar logica del servicio
+
+    @Override
+    public void registerOrder(OrderDTO orderDTO) {
+
+    }
+
+    @Override
+    public List<Product> getOrderDetail(Integer idOrder) {
+        return null;
+    }
+
+    @Override
+    public void updateOrder(Integer idOrder, OrderDTO orderDTO) {
+
+    }
 }
