@@ -15,13 +15,12 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="productId")
-    private Integer productId;
+    private String productId;
     private String name;
     private String additionalInfo;
     private State state;
     private Double price;
 
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
-    private Batch batch;
+
 
 }

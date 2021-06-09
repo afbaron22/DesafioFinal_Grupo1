@@ -1,6 +1,7 @@
 package com.mercadolibre.demo_bootcamp_spring.dtos;
 
 
+import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
@@ -21,6 +22,5 @@ public class InboundOrderDTO {
     private SectionDTO section;
     @Valid
     private List<BatchDTO> batchStock;
-
 
 }

@@ -1,5 +1,12 @@
 package com.mercadolibre.demo_bootcamp_spring.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,13 +40,17 @@ public class BatchDTO {
     private Integer currentQuantity;
 
     @NotNull(message = "Manufacturing Date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
     private LocalDate manufacturingDate;
 
     @NotNull(message = "Manufacturing Time is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
     private LocalDateTime manufacturingTime;
 
     @NotNull(message = "Due Date is required")
-    private LocalDateTime dueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
+    private LocalDate dueDate;
+
 
 
 }

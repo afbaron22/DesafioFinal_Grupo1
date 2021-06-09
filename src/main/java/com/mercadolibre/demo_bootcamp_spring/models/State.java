@@ -4,7 +4,7 @@ import lombok.Data;
 
 
 public enum State {
-    FRESCOS,
-    REFRIGERADOS,
-    CONGELADOS
+    FS,
+    RF,
+    FF
 }
