@@ -14,6 +14,7 @@ import com.mercadolibre.demo_bootcamp_spring.services.Batch.IBatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class BatchService implements IBatchService {
     @Autowired
     ProductsRepository productsRepository;
 
-    public InboundOrder saveBatch(InboundOrderDTO inboundOrderDTO){
+    public List<Batch> saveBatch(InboundOrderDTO inboundOrderDTO){
 
         var sizeBatch = getBatchSize(inboundOrderDTO);
         var section = saveSection(inboundOrderDTO,sizeBatch);
@@ -36,7 +37,7 @@ public class BatchService implements IBatchService {
         var batches = inboundOrderDTO.getBatchStock().stream().map(x-> returnBatch(x,newInboundOrder)).collect(Collectors.toList());
         inboundOrderRepository.save(newInboundOrder);
         batches.forEach(x->batchRepository.save(x));
-        return newInboundOrder;
+        return batches;
 
     }
 
