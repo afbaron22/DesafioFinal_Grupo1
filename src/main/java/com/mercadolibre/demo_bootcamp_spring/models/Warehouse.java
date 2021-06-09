@@ -18,6 +18,9 @@ public class Warehouse {
     @Column(name="idWarehouse")
     private Integer idWarehouse;
     private String address;
+    private String location;
+    private String province;
+
     @JoinTable(
             name = "rel_warehouse_products",
             joinColumns = @JoinColumn(name = "FK_WAREHOUSE", nullable = false),
