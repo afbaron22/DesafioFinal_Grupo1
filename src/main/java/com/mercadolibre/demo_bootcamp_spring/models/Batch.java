@@ -6,6 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -16,18 +21,26 @@ public class Batch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="batchNumber")
-    private Integer batchNumber;
+    private String batchNumber;
 
     @OneToOne()
     @JoinColumn(name = "FK_PRODUCT", updatable = false, nullable = false)
     private Product product;
 
     private Float currentTemperature;
+
     private Float minimumTemperature;
-    private String dueDate;
-    private String manufacturingDate;
-    private String manufacturingTime;
+
+    private LocalDate dueDate;
+
+    private LocalDate manufacturingDate;
+
+    private LocalDateTime manufacturingTime;
+
     private Integer initialQuantity;
+
     private Integer currentQuantity;
+
+
 
 }

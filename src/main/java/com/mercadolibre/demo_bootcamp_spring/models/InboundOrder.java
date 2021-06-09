@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,13 +20,15 @@ public class InboundOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="orderNumber")
     private Integer orderNumber;
-    private String orderDate;
+    private LocalDate orderDate;
 
     @OneToOne()
     @JoinColumn(name = "FK_SECTION", updatable = false, nullable = false)
     private Section section;
 
+
     @OneToMany(mappedBy = "batchNumber")
     private List<Batch> batches;
+
 
 }

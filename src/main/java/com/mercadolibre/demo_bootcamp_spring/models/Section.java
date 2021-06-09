@@ -8,19 +8,28 @@ import javax.persistence.*;
 import java.util.Stack;
 @Entity
 @Data
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Table(name="Sections")
 public class Section {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Enumerated(EnumType.ORDINAL)
+
     @Column(name="sectionId")
     private State state;
-    private Integer warehouseCode;
+    private String warehouseCode;
     private Integer minSize;
     private Integer maxSize;
     private Integer batchQuantity;
-
     @OneToOne(mappedBy = "section")
     private InboundOrder inboundOrder;
+
+    public Section(State state, String warehouseCode, Integer minSize, Integer maxSize, Integer batchQuantity) {
+        this.state = state;
+        this.warehouseCode = warehouseCode;
+        this.minSize = minSize;
+        this.maxSize = maxSize;
+        this.batchQuantity = batchQuantity;
+
+    }
 }
