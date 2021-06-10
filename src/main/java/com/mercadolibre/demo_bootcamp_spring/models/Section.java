@@ -21,8 +21,7 @@ public class Section {
     private Integer minSize;
     private Integer maxSize;
     private Integer batchQuantity;
-    @OneToOne(mappedBy = "section")
-    private InboundOrder inboundOrder;
+
     public Section(String id,State state, String warehouseCode, Integer minSize, Integer maxSize, Integer batchQuantity) {
         this.id = id;
         this.state = state;
