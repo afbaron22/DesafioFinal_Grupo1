@@ -71,10 +71,10 @@ public class BatchService implements IBatchService {
      */
     //------------------------------------------MÉTODO GETBATCHSTOCK--------------------------------------------------
     private BatchStock getBatchResponse(InboundOrderDTO inboundOrderDTO){
-        return new BatchStock(inboundOrderDTO.getBatchStock().stream().map(x->{
-                    return new BatchResponse(x.getBatchNumber(),x.getProductId(),x.getCurrentTemperature(),x.getMinimumTemperature()
-                    ,x.getInitialQuantity(),x.getCurrentQuantity(),x.getManufacturingDate().toString(),x.getManufacturingTime().toString(),x.getDueDate().toString());
-                    }).collect(Collectors.toList()));
+        return new BatchStock(inboundOrderDTO.getBatchStock().stream()
+            .map(x-> new BatchResponse(x.getBatchNumber(),x.getProductId(),x.getCurrentTemperature(),x.getMinimumTemperature()
+                ,x.getInitialQuantity(),x.getCurrentQuantity(),x.getManufacturingDate().toString(),x.getManufacturingTime().toString(),x.getDueDate().toString()))
+            .collect(Collectors.toList()));
     }
 
     /**

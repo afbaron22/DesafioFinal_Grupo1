@@ -1,16 +1,21 @@
 package com.mercadolibre.demo_bootcamp_spring.dtos;
 
-import com.mercadolibre.demo_bootcamp_spring.models.Product;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderDTO {
-    Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
+    LocalDate date;
+
     String buyerId;
+
     List<ProductDTO> products;
 }

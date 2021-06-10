@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.mercadolibre.routing.RoutingFilter;
 import java.text.SimpleDateFormat;
@@ -29,12 +30,13 @@ public class SpringConfig implements WebMvcConfigurer {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(createAfterburnerModule());
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+// objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-		objectMapper.setDateFormat(sdf);
+// SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+// sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+// objectMapper.setDateFormat(sdf);
+		objectMapper.registerModule(new JavaTimeModule());
 		return objectMapper;
 	}
 

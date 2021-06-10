@@ -14,8 +14,8 @@ import javax.validation.Valid;
 @RequestMapping(path = "/api/v1/fresh-products")
 public class BuyerController {
 
-    private IProductService productService;
-    private IOrderService orderService;
+    private final IProductService productService;
+    private final IOrderService orderService;
 
     public BuyerController(IProductService productService, IOrderService orderService) {
         this.productService = productService;
@@ -29,6 +29,7 @@ public class BuyerController {
     public ResponseEntity<?> getProducts(){
         return new ResponseEntity(productService.getProducts(), HttpStatus.OK);
     }
+
     @GetMapping("/list")
     public ResponseEntity<?> getProductsByCategory(@Valid @RequestParam State productCategory){
         return new ResponseEntity(productService.getProductsByCategory(productCategory), HttpStatus.OK);
@@ -36,12 +37,14 @@ public class BuyerController {
 
     @PostMapping("/orders")
     public ResponseEntity<?> registerOrder(@Valid @RequestBody OrderDTO orderDTO){
-        return new ResponseEntity(orderService.registerOrder(orderDTO),HttpStatus.OK);
+        return new ResponseEntity(orderService.registerOrder(orderDTO), HttpStatus.OK);
     }
+
     @GetMapping("/orders")
     public ResponseEntity<?> getOrderDetail(@Valid @RequestParam Integer idOrder){
         return new ResponseEntity(orderService.getOrderDetail(idOrder), HttpStatus.OK);
     }
+
     @PutMapping("/orders")
     public ResponseEntity<?> updateOrder(@Valid @RequestParam Integer idOrder, @RequestBody OrderDTO orderDTO){
         orderService.updateOrder(idOrder, orderDTO);

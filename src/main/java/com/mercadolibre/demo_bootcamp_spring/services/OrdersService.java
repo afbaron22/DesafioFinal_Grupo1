@@ -1,6 +1,7 @@
 package com.mercadolibre.demo_bootcamp_spring.services;
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.OrderDTO;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsNotFoundException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.Orders;
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
@@ -10,9 +11,8 @@ import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class OrdersService implements IOrderService{
@@ -45,16 +45,27 @@ public class OrdersService implements IOrderService{
         //TODO chequear que exista cantidad suficiente de cada producto, en caso negativo devolver lista de errores.
         List<Double> prices = new ArrayList<>();
         List<Product> products = new ArrayList<>();
-        Date date = new Date();
-        orderDTO.getProducts().stream().forEach(orderProduct -> {
-           Product repoProduct = productsRepository.findById(orderProduct.getProductId()).orElseThrow();
-           products.add(repoProduct);
-           //TODO usar checkProductAvailability para comrpobar que haya suficiente producto
-         /*  if (checkProductAvailability(orderProduct.getProductId(),,orderProduct.getQuantity())){
+        List<String> errores = new ArrayList<>();
 
-           };*/
-           prices.add(repoProduct.getPrice() * orderProduct.getQuantity());
+        int numberOfDays = 21;
+        LocalDate date = LocalDate.now().plusDays(numberOfDays);
+
+        orderDTO.getProducts().forEach(orderProduct -> {
+            int stockAvailable = productStock(orderProduct.getProductId(), date);
+           if (stockAvailable >= orderProduct.getQuantity()){
+               Product repoProduct = productsRepository.findById(orderProduct.getProductId()).orElseThrow();
+               products.add(repoProduct);
+               prices.add(repoProduct.getPrice() * orderProduct.getQuantity());
+           } else {
+               errores.add(orderProduct.getProductId() + " has " + stockAvailable + " items available");
+           }
         });
+
+        if (errores.size() > 0) {
+            String errorProducts = errores.stream().reduce("", (acum, error) -> acum + error + "\n");
+            throw new ProductsNotFoundException("the following products are not available: \n" + errorProducts);
+        }
+
         Double finalPrice = prices.stream().reduce(0.0, Double::sum);
         //TODO ver de cambiar nombre de la clase por purchaseOrder
         Orders newOrder = new Orders();
@@ -76,15 +87,14 @@ public class OrdersService implements IOrderService{
 
     }
 
-    private boolean checkProductAvailability(String prodId, Date dueDate, Integer purchaseQuantity){
-        List<Batch> batchList = new ArrayList<>();
-        batchList = batchRepository.findByProductIdAndDueDate(prodId,dueDate);
-        if (batchList.size() == 0){
-            return false;
+    private int productStock(String prodId, LocalDate dueDate){
+        List<Batch> batchList;
+        batchList = batchRepository.findByProductIdAndDueDate(prodId, dueDate);
+        if (batchList.isEmpty()){
+            return 0;
         }
-        int availableQuantity = batchList
-                .stream().reduce(0,(subtotal, batch) -> subtotal + batch.getCurrentQuantity(), Integer::sum);
-        return  availableQuantity >= purchaseQuantity;
+        return batchList.stream()
+                .reduce(0,(subtotal, batch) -> subtotal + batch.getCurrentQuantity(), Integer::sum);
     }
 
     private Orders orderDTOtoOrder(OrderDTO orderDTO){
