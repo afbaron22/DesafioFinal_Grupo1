@@ -19,12 +19,10 @@ import javax.validation.Valid;
 @RequestMapping(path = "/api/v1/fresh-products")
 public class BatchController {
 
-
+    @Autowired
     IBatchService batchService;
 
-    public BatchController(IBatchService batchService) {
-        this.batchService = batchService;
-    }
+
 
     @PostMapping("/inboundorder")
     public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult){

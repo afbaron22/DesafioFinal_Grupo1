@@ -1,5 +1,6 @@
 package com.mercadolibre.demo_bootcamp_spring.services.Batch;
 import com.mercadolibre.demo_bootcamp_spring.dtos.*;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.NonExistentProductException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
@@ -44,6 +45,7 @@ public class BatchService implements IBatchService {
     //------------------------------------------MÉTODO SAVEBATCH--------------------------------------------------
     public BatchStock saveBatch(InboundOrderTransaction inboundOrder){
         var inboundOrderDTO = inboundOrder.getInboundOrder();
+
         var sizeBatch = getBatchSize(inboundOrderDTO);
         var section   = saveSection(inboundOrderDTO,sizeBatch);
         var newInboundOrder   = new InboundOrder(inboundOrderDTO.getOrderNumber(),inboundOrderDTO.getOrderDate(),section);
@@ -79,6 +81,9 @@ public class BatchService implements IBatchService {
             compareBatch(array[i],arrayBatchDto[i]);
         }
         return getBatchResponse(inboundOrderDTO);
+    }
+    private Boolean existInboundOrder(InboundOrderDTO inboundOrderDTO){
+        return inboundOrderRepository.findById(inboundOrderDTO.getOrderNumber()).isPresent();
     }
     /**MÉTODO COMPAREBATCH
      * Este método se encarga de comparar un batch que esta guardado en persistencia y lo compara con un bachtDto

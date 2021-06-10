@@ -2,6 +2,7 @@ package com.mercadolibre.demo_bootcamp_spring.config;
 
 import com.mercadolibre.demo_bootcamp_spring.exceptions.ApiError;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.ApiException;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
 import com.newrelic.api.agent.NewRelic;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-@ControllerAdvice
+
 public class ControllerExceptionHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
@@ -38,6 +39,7 @@ public class ControllerExceptionHandler {
 		return ResponseEntity.status(apiError.getStatus())
 				.body(apiError);
 	}
+
 
 	@ExceptionHandler(value = { Exception.class })
 	protected ResponseEntity<ApiError> handleUnknownException(Exception e) {
