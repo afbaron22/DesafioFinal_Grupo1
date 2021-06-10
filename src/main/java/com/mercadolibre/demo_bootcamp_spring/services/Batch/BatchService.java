@@ -24,7 +24,7 @@ public class BatchService implements IBatchService {
     BatchRepository        batchRepository;
     ProductsRepository     productsRepository;
 
-    /**
+    /**CONSTRUCTOR
      * Contructor encargado de inyectar las dependencias de los repositorios.
      * @param inboundOrderRepository
      * @param sectionRepository
@@ -37,7 +37,7 @@ public class BatchService implements IBatchService {
         this.batchRepository        = batchRepository;
         this.productsRepository     = productsRepository;
     }
-    /**
+    /**MÉTODO SAVEBATCH
      *Este método se encarga de guardar en persistencia un InboundOrderTransaction, este es un objecto que el
      * usuario envia, posteriormente el metodo extrae el contenido de este inbound y extraé los parametros
      * requeridos para guardar todos los datos en las tablas , estos atributos son el tamaño del bache, la sección
@@ -58,7 +58,7 @@ public class BatchService implements IBatchService {
         return getBatchResponse(inboundOrderDTO);
     }
 
-    /**
+    /**MÉTODO GETBATCHSTOCK
      * Este método se encarga de ajustar la respuesta con los campos requeridos para presentar al cliente,
      * este método es invocado desde el método saveBatch.El funcionamiento consiste en un stream que extraé
      * los datos del inboutOrderDto que llega por parametro y transforma las fechas a string para evitar los
@@ -74,7 +74,7 @@ public class BatchService implements IBatchService {
                     }).collect(Collectors.toList()));
     }
 
-    /**
+    /**MÉTODO GETBATCHSIZE
      * método encargado de calcular ir por cada batch enviado por el usuario y sumar el tamaño de cada uno,
      * este calculo es necesario para posteriormente guardar una sección.El método consiste en un stream que mapea
      * el contenido de cada bache y con un getter extraé la cantidad.Finalmente con reduce se realiza la suma.
@@ -82,7 +82,7 @@ public class BatchService implements IBatchService {
      * @return
      */
     //------------------------------------------MÉTODO GETBATCHSIZE--------------------------------------------------
-    private Integer getBatchSize(InboundOrderDTO inboundOrderDTO){
+    public Integer getBatchSize(InboundOrderDTO inboundOrderDTO){
         return  inboundOrderDTO
                 .getBatchStock().stream()
                 .map(x-> {
@@ -90,7 +90,7 @@ public class BatchService implements IBatchService {
                 }).collect(Collectors.toList()).stream().reduce(0,(a,b)->a+b);
     }
 
-    /**
+    /**MÉTODO SAVESECTION
      * Este método se encarga de crear una sección con los datos de un dto que llega por parametro y el respectivo
      * tamaño de todos los baches enviados por el usuario.
      * @param inboundOrderDTO
@@ -104,7 +104,7 @@ public class BatchService implements IBatchService {
         return section;
     }
 
-    /**
+    /**MÉTODO RETURNBATCH
      * método encargado de regresar un bache con sus respectivos campos requeridos, este método es principalmente
      * invocado desde saveBatch.
      * @param batchDTO
@@ -117,4 +117,5 @@ public class BatchService implements IBatchService {
         var newBatch = new Batch(null,productTest,batchDTO.getCurrentTemperature(),batchDTO.getMinimumTemperature(),batchDTO.getDueDate(),batchDTO.getManufacturingDate(),batchDTO.getManufacturingTime(),batchDTO.getInitialQuantity(),batchDTO.getCurrentQuantity(),inboundOrder);
         return newBatch;
     }
+
 }

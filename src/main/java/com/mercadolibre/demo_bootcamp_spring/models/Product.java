@@ -20,6 +20,4 @@ public class Product {
     private String additionalInfo;
     private State state;
 
-
-
 }

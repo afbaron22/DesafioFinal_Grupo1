@@ -2,7 +2,9 @@ package com.mercadolibre.demo_bootcamp_spring.dtos;
 
 
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Validated
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class InboundOrderDTO {
 
