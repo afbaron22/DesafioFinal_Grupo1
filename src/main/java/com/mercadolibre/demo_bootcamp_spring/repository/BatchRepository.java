@@ -12,8 +12,7 @@ import java.util.List;
 @Repository
 public interface BatchRepository extends JpaRepository<Batch,Integer> {
 
-    @Query("select b from Batch b join b.product p where (p.productid = :productId) where b.dueDate > :dueDate and b.quantity > :quantity")
-    List<Batch> findByProductIdAndQuantiyAndDueDate(
-            @Param("productId")Integer productId,@Param("quantity") Integer quantity,
-            @Param("dueDate")  Date dueDate);
+    @Query("select b from Batch b join b.product p where p.productid = :productId and b.dueDate > :dueDate")
+    List<Batch> findByProductIdAndDueDate(
+            @Param("productId")String productId, @Param("dueDate")  Date dueDate);
 }

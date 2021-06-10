@@ -27,24 +27,27 @@ public class Orders {
     private String user;
     private String createdAt;
 
-  /*  @JoinTable(
+  @JoinTable(
             name = "rel_order_products",
             joinColumns = @JoinColumn(name = "FK_ORDER", nullable = false),
             inverseJoinColumns = @JoinColumn(name="FK_PRODUCT", nullable = false)
     )
     @ManyToMany(cascade = CascadeType.ALL)
-    private List<Product> products*/;
+    private List<Product> products;
 
-    private InetAddress getUserAdd() throws IOException {
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress("google.com", 80));
-        return socket.getLocalAddress();
+    public Integer getOrderId() {
+        return orderId;
     }
 
-    private String getDate(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        return dtf.format(now).toString();
+    public String getUser() {
+        return user;
+    }
 
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<Product> getProducts() {
+        return products;
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IOrderService {
 
-    Integer registerOrder(OrderDTO orderDTO);
+    Double registerOrder(OrderDTO orderDTO);
 
     List<Product> getOrderDetail(Integer idOrder);
 

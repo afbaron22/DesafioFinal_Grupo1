@@ -2,6 +2,7 @@ package com.mercadolibre.demo_bootcamp_spring.services.Batch;
 
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.*;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.BatchNotFoundException;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.NonExistentProductException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
@@ -13,6 +14,8 @@ import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

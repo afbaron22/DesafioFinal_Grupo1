@@ -11,6 +11,4 @@ public interface IProductService {
     List<Product> getProducts();
 
     List<Product> getProductsByCategory(State state);
-
-
 }

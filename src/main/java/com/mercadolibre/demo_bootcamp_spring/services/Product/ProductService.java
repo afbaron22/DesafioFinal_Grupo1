@@ -4,19 +4,24 @@ import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsNotFoundExceptio
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.models.State;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
+import com.mercadolibre.demo_bootcamp_spring.services.Batch.IBatchService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ProductService implements IProductService{
 
     public ProductsRepository productsRepo;
+    public IBatchService batchService;
 
-    public ProductService(ProductsRepository productsRepo) {
+    public ProductService(ProductsRepository productsRepo, IBatchService batchService) {
         this.productsRepo = productsRepo;
+        this.batchService = batchService;
     }
 
-    //TODO pasar de Objet a DTO para devolver al front DTO
+//TODO pasar de Objet a DTO para devolver al front DTO
 
     @Override
     public List<Product> getProducts() {
