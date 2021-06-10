@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface IBatchService {
     BatchStock saveBatch(@Valid InboundOrderTransaction inboundOrderDTO);
+    BatchStock putBatch(InboundOrderTransaction inboundOrder);
 }
