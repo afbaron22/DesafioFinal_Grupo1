@@ -27,13 +27,13 @@ public class Orders {
     private String user;
     private String createdAt;
 
-    @JoinTable(
+  /*  @JoinTable(
             name = "rel_order_products",
             joinColumns = @JoinColumn(name = "FK_ORDER", nullable = false),
             inverseJoinColumns = @JoinColumn(name="FK_PRODUCT", nullable = false)
     )
     @ManyToMany(cascade = CascadeType.ALL)
-    private List<Product> products;
+    private List<Product> products*/;
 
     private InetAddress getUserAdd() throws IOException {
         Socket socket = new Socket();
