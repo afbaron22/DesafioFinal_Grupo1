@@ -1,6 +1,4 @@
 package com.mercadolibre.demo_bootcamp_spring.services.Batch;
-
-
 import com.mercadolibre.demo_bootcamp_spring.dtos.*;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.NonExistentProductException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
@@ -11,9 +9,6 @@ import com.mercadolibre.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
 import org.springframework.stereotype.Service;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +53,80 @@ public class BatchService implements IBatchService {
         return getBatchResponse(inboundOrderDTO);
     }
 
+    /**MÉTODO PUTBATCH
+     *Este método se encarga de actualizar un batch existente en caso de alguna ligera modificación como las
+     * fechas de caducidad, estado del batch , y las cantidades iniciales excepto las que ya se han vendido.
+     * Mediante un stream se recorre los baches asociados a ese inboundorder.
+     * @param inboundOrder
+     * @return
+     */
+    //------------------------------------------MÉTODO PUTBATCH--------------------------------------------------
+    public BatchStock putBatch(InboundOrderTransaction inboundOrder){
+        var inboundOrderDTO = inboundOrder.getInboundOrder();
+        var sizeBatch = getBatchSize(inboundOrderDTO);
+        var searchedInbound =inboundOrderRepository.findById(inboundOrderDTO.getOrderNumber()).orElseThrow();
+        updateSection(inboundOrderDTO,searchedInbound,sizeBatch);
+        updateOrderDate(inboundOrderDTO,searchedInbound);
+
+        var arrayBatch = inboundOrderDTO.getBatchStock().toArray();
+        BatchDTO[] arrayBatchDto = new BatchDTO[arrayBatch.length];
+        var arrayB = batchRepository.findByInboundOrder(inboundOrder.getInboundOrder().getOrderNumber()).toArray();
+        Batch[] array = new Batch[arrayB.length];
+
+        for(var i = 0; i < arrayBatchDto.length;i++){
+            array[i] = (Batch) arrayB[i];
+            arrayBatchDto[i] = (BatchDTO) arrayBatch[i];
+            compareBatch(array[i],arrayBatchDto[i]);
+        }
+        return getBatchResponse(inboundOrderDTO);
+    }
+    /**MÉTODO COMPAREBATCH
+     * Este método se encarga de comparar un batch que esta guardado en persistencia y lo compara con un bachtDto
+     * correspondiente al batch que se desea actualizar , va campo a campo y actualiza la información.
+     * @param batch
+     * @param batchDTO
+     */
+    //------------------------------------------MÉTODO COMPAREBATCH--------------------------------------------------
+
+    private void compareBatch(Batch batch,BatchDTO batchDTO){
+        batch.setCurrentTemperature(batchDTO.getCurrentTemperature());
+        batch.setMinimumTemperature(batchDTO.getMinimumTemperature());
+        batch.setDueDate(batchDTO.getDueDate());
+        batch.setManufacturingDate(batchDTO.getManufacturingDate());
+        batch.setManufacturingTime(batchDTO.getManufacturingTime());
+        batch.setCurrentQuantity(batchDTO.getInitialQuantity()-(batch.getInitialQuantity()-batch.getCurrentQuantity()));
+        batch.setInitialQuantity(batchDTO.getInitialQuantity());
+        batchRepository.save(batch);
+    }
+
+    /**MÉTODO UPDATE
+     *Este método hace un update de la fecha de un inboundOrder y guarda en el repositorio.
+     * @param inboundOrderDTO
+     * @param inboundOrder
+     */
+    //------------------------------------------MÉTODO UPDATE ORDERDATE--------------------------------------------------
+    private void updateOrderDate(InboundOrderDTO inboundOrderDTO,InboundOrder inboundOrder){
+        inboundOrder.setOrderDate(inboundOrderDTO.getOrderDate());
+        inboundOrderRepository.save(inboundOrder);
+    }
+
+    /**MÉTODO UPDATE UPDATESECTION
+     * Este método se encarga de actualizar la sección con la que llega de un DTO, a su vez llega el tamaño de toda
+     * la lista de baches.Actualiza los respectivos campos que componen la sección y guarda en persistencia.
+     * @param inboundOrderDTO
+     * @param inboundOrder
+     * @param sizeBatch
+     */
+    //---------------------------------------MÉTODO UPDATE UPDATESECTION--------------------------------------------------
+    private void updateSection(InboundOrderDTO inboundOrderDTO,InboundOrder inboundOrder,Integer sizeBatch){
+        var section =inboundOrder.getSection();
+        section.setBatchQuantity(sizeBatch);
+        section.setState(inboundOrderDTO.getSection().getSectionCode());
+        section.setWarehouseCode(inboundOrderDTO.getSection().getWarehouseCode());
+        sectionRepository.save(section);
+    }
+
+
     /**MÉTODO GETBATCHSTOCK
      * Este método se encarga de ajustar la respuesta con los campos requeridos para presentar al cliente,
      * este método es invocado desde el método saveBatch.El funcionamiento consiste en un stream que extraé
@@ -86,7 +155,7 @@ public class BatchService implements IBatchService {
         return  inboundOrderDTO
                 .getBatchStock().stream()
                 .map(x-> {
-                    return x.getCurrentQuantity();
+                    return x.getInitialQuantity();
                 }).collect(Collectors.toList()).stream().reduce(0,(a,b)->a+b);
     }
 

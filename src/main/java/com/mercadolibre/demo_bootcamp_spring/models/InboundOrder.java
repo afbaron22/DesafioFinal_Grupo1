@@ -21,13 +21,10 @@ public class InboundOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="orderNumber")
-    private Integer orderNumber;
+    private String orderNumber;
     private LocalDate orderDate;
 
     @OneToOne()
     @JoinColumn(name = "FK_SECTION", updatable = false, nullable = false)
     private Section section;
-
-
-
 }

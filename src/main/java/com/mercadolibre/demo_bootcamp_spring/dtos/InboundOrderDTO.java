@@ -19,7 +19,7 @@ import java.util.List;
 public class InboundOrderDTO {
 
     @NotNull(message = "Order Number is required")
-    private Integer orderNumber;
+    private String orderNumber;
     @NotNull(message = "Order Date  is required")
     private LocalDate orderDate;
     @Valid

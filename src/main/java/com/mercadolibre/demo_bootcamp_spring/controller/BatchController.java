@@ -38,7 +38,7 @@ public class BatchController {
         if (bindingResult.hasErrors()) {
             throw new ValidationErrorException(bindingResult.getFieldError().getField(),bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
-        return new ResponseEntity(batchService.saveBatch(inboundOrder), HttpStatus.CREATED);
+        return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
 }
 

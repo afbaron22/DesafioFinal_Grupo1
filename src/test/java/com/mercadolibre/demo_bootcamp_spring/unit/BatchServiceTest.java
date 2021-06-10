@@ -36,35 +36,8 @@ public class BatchServiceTest {
     @InjectMocks
     BatchService service;
 
-    @BeforeEach
-    void setUp() {
-        LocalDate date = LocalDate.parse("2018-02-27");
-        var section = new Section("1",State.FF,"1",0,0,5);
-        var sectionDto = new SectionDTO(State.FF,"1");
-        var batchStock = new BatchDTO("1","1",23F,18F,1,3,LocalDate.parse("2018-02-27"),LocalDateTime.parse("2018-02-27 18:14:01"),LocalDate.parse("2018-02-27 18:14:01"));
-        var batchStock2 = new BatchDTO("1","1",23F,18F,1,3,LocalDate.parse("2018-02-27"),LocalDateTime.parse("2018-02-27 18:14:01"),LocalDate.parse("2018-02-27 18:14:01"));
-        var res = List.of(batchStock,batchStock2);
-        Product product = new Product("1","Manzanas Colombianas","Rojas",State.FF);
 
-    }
 
-    @Test
-    void testReturnBatch() {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        var sectionDto = new SectionDTO(State.FF,"1");
-        var batchStock = new BatchDTO("1","1",23F,18F,1,3,LocalDate.parse("2018-02-27"),LocalDateTime.parse("2018-02-27",df),LocalDate.parse("2018-02-27"));
-        var batchStock2 = new BatchDTO("2","1",23F,18F,1,3,LocalDate.parse("2018-02-27"),LocalDateTime.parse("2018-02-27",df),LocalDate.parse("2018-02-27"));    var inboundOrderDto = new InboundOrderDTO(1,LocalDate.parse("2018-02-27"),sectionDto,List.of(batchStock,batchStock2));
-        var size = service.getBatchSize(inboundOrderDto);
-        Assertions.assertEquals(2,size);
-
-    }
-    private Integer getBatchSize(InboundOrderDTO inboundOrderDTO){
-        return  inboundOrderDTO
-                .getBatchStock().stream()
-                .map(x-> {
-                    return x.getCurrentQuantity();
-                }).collect(Collectors.toList()).stream().reduce(0,(a, b)->a+b);
-    }
 
 
 
