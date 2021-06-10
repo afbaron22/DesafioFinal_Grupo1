@@ -7,7 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
@@ -18,10 +20,12 @@ import java.time.LocalDateTime;
 
 @Validated
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BatchDTO {
 
     @NotNull(message = "Batch Number is required")
-    private Integer batchNumber;
+    private String batchNumber;
 
     @NotBlank(message = "Product Id cant be empty")
     @Size(min = 3, max = 45, message = "The length of Product Id must be between 3 and 45 characters")
@@ -44,7 +48,7 @@ public class BatchDTO {
     private LocalDate manufacturingDate;
 
     @NotNull(message = "Manufacturing Time is required")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
     private LocalDateTime manufacturingTime;
 
     @NotNull(message = "Due Date is required")

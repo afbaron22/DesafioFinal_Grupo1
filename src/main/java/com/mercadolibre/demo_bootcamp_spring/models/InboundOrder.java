@@ -1,6 +1,7 @@
 package com.mercadolibre.demo_bootcamp_spring.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mercadolibre.demo_bootcamp_spring.dtos.BatchDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,15 +21,10 @@ public class InboundOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="orderNumber")
-    private Integer orderNumber;
+    private String orderNumber;
     private LocalDate orderDate;
 
     @OneToOne()
     @JoinColumn(name = "FK_SECTION", updatable = false, nullable = false)
     private Section section;
-
-
-    @OneToMany(mappedBy = "inboundOrder")
-    private List<Batch> batches;
-
 }
