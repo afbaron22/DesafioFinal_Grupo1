@@ -1,7 +1,8 @@
 package com.mercadolibre.demo_bootcamp_spring.config;
 
-import com.mercadolibre.demo_bootcamp_spring.exceptions.ApiError;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.ApiException;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.*;
+import com.mercadolibre.demo_bootcamp_spring.models.ErrorMessage;
+import com.mercadolibre.demo_bootcamp_spring.models.ValidationError;
 import com.newrelic.api.agent.NewRelic;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -47,5 +48,23 @@ public class ControllerExceptionHandler {
 		ApiError apiError = new ApiError("internal_error", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR.value());
 		return ResponseEntity.status(apiError.getStatus())
 				.body(apiError);
+	}
+
+	@ExceptionHandler({NonExistentProductException.class})
+	public ResponseEntity<?> handleResponseExceptions(RuntimeException runtimeException){
+		ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ValidationErrorException.class)
+	public ResponseEntity<?> ValidationErrorException(ValidationErrorException validationErrorException){
+		ValidationError validationError = new ValidationError(validationErrorException.getField(), validationErrorException.getMessage(), HttpStatus.BAD_REQUEST.value());
+		return new ResponseEntity<ValidationError>(validationError, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ProductsOutOfStockException.class)
+	public ResponseEntity<?> ProductOutOfStockException(ProductsOutOfStockException productsOutOfStockException){
+		ErrorMessage errorMessage = new ErrorMessage(productsOutOfStockException.getMessage(), HttpStatus.BAD_REQUEST.value());
+		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
 	}
 }

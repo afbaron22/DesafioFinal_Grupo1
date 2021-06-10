@@ -1,6 +1,6 @@
 package com.mercadolibre.demo_bootcamp_spring.services.Product;
 
-import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsNotFoundException;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.models.State;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
@@ -26,7 +26,7 @@ public class ProductService implements IProductService{
     @Override
     public List<Product> getProducts() {
         if (productsRepo.count() <= 0){
-            throw new ProductsNotFoundException("No products where found");
+            throw new ProductsOutOfStockException("No products where found");
 
         }
         return productsRepo.findAll();
@@ -37,7 +37,7 @@ public class ProductService implements IProductService{
         List<Product> productList = new ArrayList<>();
         productList = productsRepo.findByCategory(state.toString());
         if (productList == null){
-            throw new ProductsNotFoundException("No products where found in the category: " + state.toString() );
+            throw new ProductsOutOfStockException("No products where found in the category: " + state.toString() );
         }
         return productList;
     }

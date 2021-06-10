@@ -61,6 +61,11 @@ public class BatchService implements IBatchService {
         return getBatchResponse(inboundOrderDTO);
     }
 
+    @Override
+    public BatchStock putBatch(InboundOrderTransaction inboundOrder) {
+        return null;
+    }
+
     /**
      * Este método se encarga de ajustar la respuesta con los campos requeridos para presentar al cliente,
      * este método es invocado desde el método saveBatch.El funcionamiento consiste en un stream que extraé

@@ -1,14 +1,13 @@
 package com.mercadolibre.demo_bootcamp_spring.services;
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.OrderDTO;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsNotFoundException;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.Orders;
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.repository.BatchRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.OrdersRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
-import com.mercadolibre.demo_bootcamp_spring.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,6 +20,8 @@ public class OrdersService implements IOrderService{
     public ProductsRepository productsRepository;
     public BatchRepository batchRepository;
 
+
+
     public OrdersService(OrdersRepository ordersRepository, ProductsRepository productsRepository, BatchRepository batchRepository) {
         this.ordersRepository = ordersRepository;
         this.productsRepository = productsRepository;
@@ -29,7 +30,8 @@ public class OrdersService implements IOrderService{
 //TODO implementar logica del servicio
 
     @Override
-    public Double registerOrder(OrderDTO orderDTO) {
+
+    public Double registerOrder(OrderDTO orderDTO ) throws ProductsOutOfStockException {
         //Dar de alta una orden con la lista de productos que componen la
         //PurchaseOrder. Calcular el precio final, y devolverlo junto a un status
         //code “201 CREATED”. Si no hay stock de un producto
@@ -63,7 +65,7 @@ public class OrdersService implements IOrderService{
 
         if (errores.size() > 0) {
             String errorProducts = errores.stream().reduce("", (acum, error) -> acum + error + "\n");
-            throw new ProductsNotFoundException("the following products are not available: \n" + errorProducts);
+            throw new ProductsOutOfStockException("the following products are not available: \n" + errorProducts);
         }
 
         Double finalPrice = prices.stream().reduce(0.0, Double::sum);
@@ -72,6 +74,8 @@ public class OrdersService implements IOrderService{
         newOrder.setUser(orderDTO.getBuyerId());
         newOrder.setProducts(products);
         newOrder.setCreatedAt(orderDTO.getDate().toString());
+        newOrder = ordersRepository.save(newOrder);
+        //TODO consultar a JOHI si necesitamos el ID.
         return finalPrice;
     }
 
