@@ -23,8 +23,8 @@ public class Section {
     private Integer batchQuantity;
     @OneToOne(mappedBy = "section")
     private InboundOrder inboundOrder;
-
-    public Section(State state, String warehouseCode, Integer minSize, Integer maxSize, Integer batchQuantity) {
+    public Section(String id,State state, String warehouseCode, Integer minSize, Integer maxSize, Integer batchQuantity) {
+        this.id = id;
         this.state = state;
         this.warehouseCode = warehouseCode;
         this.minSize = minSize;
@@ -32,4 +32,6 @@ public class Section {
         this.batchQuantity = batchQuantity;
 
     }
+
+
 }

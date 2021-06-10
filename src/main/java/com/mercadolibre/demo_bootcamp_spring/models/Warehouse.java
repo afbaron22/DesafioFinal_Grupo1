@@ -21,6 +21,7 @@ public class Warehouse {
     private String location;
     private String province;
 
+/*
     @JoinTable(
             name = "rel_warehouse_products",
             joinColumns = @JoinColumn(name = "FK_WAREHOUSE", nullable = false),
@@ -28,5 +29,6 @@ public class Warehouse {
     )
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
+*/
 
 }
