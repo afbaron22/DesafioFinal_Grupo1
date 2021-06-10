@@ -5,29 +5,30 @@ import com.mercadolibre.demo_bootcamp_spring.dtos.BatchDTO;
 import com.mercadolibre.demo_bootcamp_spring.dtos.InboundOrderDTO;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
-import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.models.Section;
 import com.mercadolibre.demo_bootcamp_spring.repository.BatchRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class BatchService implements IBatchService {
 
-    @Autowired
-    InboundOrderRepository inboundOrderRepository;
-    @Autowired
-    SectionRepository sectionRepository;
-    @Autowired
-    BatchRepository batchRepository;
-    @Autowired
-    ProductsRepository productsRepository;
+    private InboundOrderRepository inboundOrderRepository;
+    private SectionRepository sectionRepository;
+    private BatchRepository batchRepository;
+    private ProductsRepository productsRepository;
+
+    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository,
+                        BatchRepository batchRepository, ProductsRepository productsRepository) {
+        this.inboundOrderRepository = inboundOrderRepository;
+        this.sectionRepository = sectionRepository;
+        this.batchRepository = batchRepository;
+        this.productsRepository = productsRepository;
+    }
 
     public InboundOrder saveBatch(InboundOrderDTO inboundOrderDTO){
 

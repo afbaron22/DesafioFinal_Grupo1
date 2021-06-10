@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductsRepository extends JpaRepository<Product,Integer> {
+public interface ProductsRepository extends JpaRepository<Product,String> {
 
     @Query("select p from Product p where p.category = ?1")
     List<Product> findByCategory(String category);
