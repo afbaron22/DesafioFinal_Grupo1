@@ -1,6 +1,5 @@
 package com.mercadolibre.demo_bootcamp_spring.services;
 
-import com.mercadolibre.demo_bootcamp_spring.dtos.InboundOrderDTO;
 import com.mercadolibre.demo_bootcamp_spring.dtos.OrderDTO;
 import com.mercadolibre.demo_bootcamp_spring.models.Orders;
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
@@ -10,19 +9,20 @@ import com.mercadolibre.demo_bootcamp_spring.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class OrdersService implements IOrderService{
 
-    @Autowired
-    OrdersRepository ordersRepository;
-    @Autowired
-    ProductsRepository productsRepository;
-    @Autowired
-    WarehouseRepository warehouseRepository;
+    public OrdersRepository ordersRepository;
+    public ProductsRepository productsRepository;
+    public WarehouseRepository warehouseRepository;
+
+    public OrdersService(OrdersRepository ordersRepository, ProductsRepository productsRepository, WarehouseRepository warehouseRepository) {
+        this.ordersRepository = ordersRepository;
+        this.productsRepository = productsRepository;
+        this.warehouseRepository = warehouseRepository;
+    }
 
     //TODO implementar logica del servicio
 
@@ -49,11 +49,13 @@ public class OrdersService implements IOrderService{
 
     @Override
     public List<Product> getOrderDetail(Integer idOrder) {
+        //Mostrar productos en la orden.
         return null;
     }
 
     @Override
     public void updateOrder(Integer idOrder, OrderDTO orderDTO) {
+        //Modificar orden existente. que sea de tipo carrito para modificar
 
     }
 

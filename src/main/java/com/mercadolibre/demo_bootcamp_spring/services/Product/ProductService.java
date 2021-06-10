@@ -32,7 +32,7 @@ public class ProductService implements IProductService{
         List<Product> productList = new ArrayList<>();
         productList = productsRepo.findByCategory(state.toString());
         if (productList == null){
-            throw new ProductsNotFoundException("No products where found");
+            throw new ProductsNotFoundException("No products where found in the category: " + state.toString() );
         }
         return productList;
     }
