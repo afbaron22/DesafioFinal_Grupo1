@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -28,22 +29,7 @@ public class Orders {
     private String createdAt;
 
 
-    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
-    private List<OrderProduct> orderProducts;
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderProduct> orderProducts;
 
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public List<OrderProduct> getOrderProducts() {
-        return orderProducts;
-    }
 }

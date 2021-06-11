@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdersService implements IOrderService{
@@ -54,7 +55,7 @@ public class OrdersService implements IOrderService{
 
         Orders newOrder = new Orders();
         newOrder.setUser(orderDTO.getBuyerId());
-        newOrder.setOrderProducts(orderProductList);
+        newOrder.setOrderProducts(new HashSet<>(orderProductList));
         newOrder.setCreatedAt(orderDTO.getDate().toString());
 
         for(OrderProduct orderProduct : orderProductList){
@@ -66,13 +67,13 @@ public class OrdersService implements IOrderService{
     }
 
     @Override
-    public List<OrderProduct> getOrderDetail(Integer idOrder)   {
+    public Set<OrderProduct> getOrderDetail(Integer idOrder)   {
 
        Optional<Orders> ordersOptional = ordersRepository.findById(idOrder);
       if (ordersOptional.isEmpty()){
           throw new OrderNotFoundException(idOrder);
       }
-      return ordersOptional.get().getOrderProducts();
+      return new HashSet(ordersOptional.get().getOrderProducts());
     }
 
     @Override
@@ -85,14 +86,18 @@ public class OrdersService implements IOrderService{
         if (ordersOptional.isEmpty()){
             throw new OrderNotFoundException(idOrder);
         }
+        orderProductList = orderProductList
+            .stream()
+            .peek(orderProduct -> orderProduct.setOrders(ordersOptional.get()))
+            .collect(Collectors.toList());
+
         Orders orderToUpdate = new Orders();
         orderToUpdate = ordersOptional.get();
-        orderToUpdate.setOrderProducts(orderProductList);
+        orderToUpdate.getOrderProducts().clear();
+        orderToUpdate.getOrderProducts().addAll(new HashSet(orderProductList));
+        //orderToUpdate.setOrderProducts();
         orderToUpdate = ordersRepository.save(orderToUpdate);
 
-        for(OrderProduct orderProduct : orderProductList){
-            orderProduct.setOrders(orderToUpdate);
-        }
 
     }
 
