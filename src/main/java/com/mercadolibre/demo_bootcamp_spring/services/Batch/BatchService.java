@@ -1,7 +1,9 @@
 package com.mercadolibre.demo_bootcamp_spring.services.Batch;
 import com.mercadolibre.demo_bootcamp_spring.dtos.*;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.InvalidSectionId;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.NonExistentProductException;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.NotFoundInboundOrderId;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
 import com.mercadolibre.demo_bootcamp_spring.models.Section;
@@ -10,6 +12,11 @@ import com.mercadolibre.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.ProductsRepository;
 import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +26,7 @@ public class BatchService implements IBatchService {
     SectionRepository      sectionRepository;
     BatchRepository        batchRepository;
     ProductsRepository     productsRepository;
-
+    private LocalDate currentDate = LocalDate.now();
     /**CONSTRUCTOR
      * Contructor encargado de inyectar las dependencias de los repositorios.
      * @param inboundOrderRepository
@@ -45,7 +52,8 @@ public class BatchService implements IBatchService {
     //------------------------------------------MÉTODO SAVEBATCH--------------------------------------------------
     public BatchStock saveBatch(InboundOrderTransaction inboundOrder){
         var inboundOrderDTO = inboundOrder.getInboundOrder();
-
+        if(existInboundOrder(inboundOrderDTO))
+            throw new ExistingInboundOrderId();
         var sizeBatch = getBatchSize(inboundOrderDTO);
         var section   = saveSection(inboundOrderDTO,sizeBatch);
         var newInboundOrder   = new InboundOrder(inboundOrderDTO.getOrderNumber(),inboundOrderDTO.getOrderDate(),section);
@@ -66,7 +74,8 @@ public class BatchService implements IBatchService {
     public BatchStock putBatch(InboundOrderTransaction inboundOrder){
         var inboundOrderDTO = inboundOrder.getInboundOrder();
         var sizeBatch = getBatchSize(inboundOrderDTO);
-        var searchedInbound =inboundOrderRepository.findById(inboundOrderDTO.getOrderNumber()).orElseThrow();
+        var searchedInbound =inboundOrderRepository.findById(inboundOrderDTO.getOrderNumber())
+                .orElseThrow(()-> new NotFoundInboundOrderId());
         updateSection(inboundOrderDTO,searchedInbound,sizeBatch);
         updateOrderDate(inboundOrderDTO,searchedInbound);
 
@@ -82,6 +91,76 @@ public class BatchService implements IBatchService {
         }
         return getBatchResponse(inboundOrderDTO);
     }
+    //http://localhost:8080/api/v1/fresh-products/list?querytype=2
+
+    /**MÉTODO GETPRODUCTFROMBATCHES
+     *Este método se encarga de retornar un BatchStockProductSearch(Tipo de respuesta requerida a la hora de buscar productos
+     * asociados a los baches), este método busca en la lista de baches presente la existencia del id de un producto y trae la
+     * lista asociada a este. Posteriormente se inyecta en el método processList encargada de los respectivos ordenamientos,
+     * finalmente se regresa el objeto.
+     * @param idProducto
+     * @return
+     */
+    //---------------------------------------MÉTODO GETPRODUCTFROMBATCHES--------------------------------------------------
+    public BatchStockProductSearch getProductFromBatches(String idProducto,String ordBy){
+       var list = batchRepository.findByProductId(idProducto);
+       var listFound = processList(list,ordBy);
+       var sectionDto = getSearchedSection(list);
+      return new BatchStockProductSearch(sectionDto,idProducto,listFound);
+    }
+
+    /**MÉTODO PROCESSLIST
+     * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran
+     * los productos que no esten vencidos. Este método recibe dos parametros , la lista a procesar y el parametro de
+     * orden. Si este parametro ordBy es nulo , se devuelve la lista sin filtros, pero si se pasa alguno de los tipos
+     * de ordenamiento disponibles , se procede al ordenamiento.
+     * @param list
+     * @param ordBy
+     * @return
+     */
+    //---------------------------------------MÉTODO PROCESSLIST--------------------------------------------------
+    private List<BatchStockProduct> processList(List<Batch> list,String ordBy){
+        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate))
+            return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
+            return null;}).collect(Collectors.toList());
+        while (listFound.remove(null)) {}
+        if(ordBy=="L"){
+            Collections.sort(listFound,Comparator.comparingInt(a -> Integer.parseInt(a.getBatchnumber())));
+            return listFound;
+        }
+        else if(ordBy=="C"){
+            Collections.sort(listFound,Comparator.comparingInt(BatchStockProduct::getCurrentQuantity));
+            return listFound;
+        }
+        else if(ordBy=="F"){
+            Collections.sort(listFound,Comparator.comparing(BatchStockProduct::getDueDate));
+            return listFound;
+        }
+        else{
+            return listFound;
+        }
+
+    }
+    /**MÉTODO GETSEARCHEDSECTION
+     *Este método es invocado desde el método padre de getProductFromBatches, se encarga de buscar la sección asociada
+     * a un producto y devolver un sectionDto para su posterior presentación.
+     * @param list
+     * @return
+     */
+    //---------------------------------------MÉTODO GETSEARCHEDSECTION--------------------------------------------------
+    private SectionDTO getSearchedSection(List<Batch> list){
+        var idSection = list.get(0).getInboundOrder().getSection().getId();
+        var section = sectionRepository.findById(idSection).orElseThrow(()->new InvalidSectionId());
+        return new SectionDTO(section.getState(),section.getWarehouseCode());
+    }
+
+    /**MÉTODO EXISTORDER
+     *Este método es invocado como una validación a la hora de guardar un inboundOrder, si por alguna razón el numero
+     * de orden ya existe retorna falso.
+     * @param inboundOrderDTO
+     * @return
+     */
+    //------------------------------------------MÉTODO EXISTORDER--------------------------------------------------
     private Boolean existInboundOrder(InboundOrderDTO inboundOrderDTO){
         return inboundOrderRepository.findById(inboundOrderDTO.getOrderNumber()).isPresent();
     }

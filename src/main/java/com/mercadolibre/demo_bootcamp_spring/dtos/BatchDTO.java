@@ -52,7 +52,7 @@ public class BatchDTO {
     private LocalDateTime manufacturingTime;
 
     @NotNull(message = "Due Date is required")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
     private LocalDate dueDate;
 
 

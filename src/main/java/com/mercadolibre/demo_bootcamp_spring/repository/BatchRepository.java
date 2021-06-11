@@ -12,4 +12,7 @@ import java.util.List;
 public interface BatchRepository extends JpaRepository<Batch,Integer> {
     @Query("SELECT u FROM Batch u WHERE u.inboundOrder.orderNumber = ?1")
     List<Batch> findByInboundOrder(String idInbound);
+
+    @Query("SELECT u FROM Batch u WHERE u.product.productId = ?1")
+    List<Batch> findByProductId(String idInbound);
 }

@@ -19,10 +19,10 @@ import javax.validation.Valid;
 @RequestMapping(path = "/api/v1/fresh-products")
 public class BatchController {
 
-    @Autowired
     IBatchService batchService;
-
-
+    public BatchController(IBatchService batchService) {
+        this.batchService = batchService;
+    }
 
     @PostMapping("/inboundorder")
     public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult){
@@ -38,5 +38,11 @@ public class BatchController {
         }
         return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
+    @GetMapping(path = "/list")
+    public ResponseEntity<?> getProduct(@RequestParam Integer querytype,@RequestParam(required = false) String ordBy){
+
+        return new ResponseEntity(batchService.getProductFromBatches(String.valueOf(querytype), ordBy), HttpStatus.CREATED);
+    }
+
 }
 
