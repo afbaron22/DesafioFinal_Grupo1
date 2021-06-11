@@ -1,9 +1,6 @@
 package com.mercadolibre.demo_bootcamp_spring.services.Batch;
 import com.mercadolibre.demo_bootcamp_spring.dtos.*;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.InvalidSectionId;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.NonExistentProductException;
-import com.mercadolibre.demo_bootcamp_spring.exceptions.NotFoundInboundOrderId;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.*;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
 import com.mercadolibre.demo_bootcamp_spring.models.InboundOrder;
 import com.mercadolibre.demo_bootcamp_spring.models.Section;
@@ -14,9 +11,7 @@ import com.mercadolibre.demo_bootcamp_spring.repository.SectionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +76,7 @@ public class BatchService implements IBatchService {
 
         var arrayBatch = inboundOrderDTO.getBatchStock().toArray();
         BatchDTO[] arrayBatchDto = new BatchDTO[arrayBatch.length];
-        var arrayB = batchRepository.findByInboundOrder(inboundOrder.getInboundOrder().getOrderNumber()).toArray();
+        var arrayB = batchRepository.findByInboundOrder(inboundOrder.getInboundOrder().getOrderNumber()).orElseThrow(()->new NotExistingBatch()).toArray();
         Batch[] array = new Batch[arrayB.length];
 
         for(var i = 0; i < arrayBatchDto.length;i++){
@@ -103,11 +98,29 @@ public class BatchService implements IBatchService {
      */
     //---------------------------------------MÉTODO GETPRODUCTFROMBATCHES--------------------------------------------------
     public BatchStockProductSearch getProductFromBatches(String idProducto,String ordBy){
-       var list = batchRepository.findByProductId(idProducto);
+        if(ordBy==null) ordBy="Default";
+       var list = batchRepository.findByProductId(idProducto).orElseThrow(()->new NotExistingBatch());
        var listFound = processList(list,ordBy);
        var sectionDto = getSearchedSection(list);
       return new BatchStockProductSearch(sectionDto,idProducto,listFound);
     }
+
+    /**
+     *
+     * @param idProducto
+     * @return
+     */
+    //---------------------------------------MÉTODO GETPRODUCTFROMWAREHOUSES--------------------------------------------------
+    public SearchedWarehouseProducts getProductFromWarehouses(String idProducto){
+        Map<String,String> warehouses = new HashMap<>();
+        var res =batchRepository.findWarehousesWithProduct(idProducto).orElseThrow(()-> new NoRelatedWarehousesToProduct());
+        var warehouseList =res.stream().map(x->{
+            warehouses.put("warehousecode",x[0].toString());
+            warehouses.put("totalQuantity",x[1].toString());
+            return warehouses; }).collect(Collectors.toList());
+        return new SearchedWarehouseProducts(idProducto,warehouseList);
+    }
+
 
     /**MÉTODO PROCESSLIST
      * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran
@@ -120,27 +133,18 @@ public class BatchService implements IBatchService {
      */
     //---------------------------------------MÉTODO PROCESSLIST--------------------------------------------------
     private List<BatchStockProduct> processList(List<Batch> list,String ordBy){
-        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate))
-            return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
+        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate)) return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
             return null;}).collect(Collectors.toList());
         while (listFound.remove(null)) {}
-        if(ordBy=="L"){
+        if(ordBy.equals("L"))
             Collections.sort(listFound,Comparator.comparingInt(a -> Integer.parseInt(a.getBatchnumber())));
-            return listFound;
-        }
-        else if(ordBy=="C"){
+        else if(ordBy.equals("C"))
             Collections.sort(listFound,Comparator.comparingInt(BatchStockProduct::getCurrentQuantity));
-            return listFound;
-        }
-        else if(ordBy=="F"){
+        else if(ordBy.equals("F"))
             Collections.sort(listFound,Comparator.comparing(BatchStockProduct::getDueDate));
-            return listFound;
-        }
-        else{
-            return listFound;
-        }
-
+        return listFound;
     }
+
     /**MÉTODO GETSEARCHEDSECTION
      *Este método es invocado desde el método padre de getProductFromBatches, se encarga de buscar la sección asociada
      * a un producto y devolver un sectionDto para su posterior presentación.
@@ -252,7 +256,7 @@ public class BatchService implements IBatchService {
      */
     //------------------------------------------MÉTODO SAVESECTION--------------------------------------------------
     private Section saveSection(InboundOrderDTO inboundOrderDTO,Integer sizeBatch){
-        var section = new Section(null,inboundOrderDTO.getSection().getSectionCode(),"1",0,0,sizeBatch);
+        var section = new Section(null,inboundOrderDTO.getSection().getSectionCode(),inboundOrderDTO.getSection().getWarehouseCode(),0,0,sizeBatch);
         sectionRepository.save(section);
         return section;
     }

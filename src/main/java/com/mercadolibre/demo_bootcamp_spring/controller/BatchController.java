@@ -25,7 +25,7 @@ public class BatchController {
     }
 
     @PostMapping("/inboundorder")
-    public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult){
+    public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult) throws Exception{
         if (bindingResult.hasErrors()) {
             throw new ValidationErrorException(bindingResult.getFieldError().getField(),bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
@@ -42,6 +42,11 @@ public class BatchController {
     public ResponseEntity<?> getProduct(@RequestParam Integer querytype,@RequestParam(required = false) String ordBy){
 
         return new ResponseEntity(batchService.getProductFromBatches(String.valueOf(querytype), ordBy), HttpStatus.CREATED);
+    }
+    @GetMapping(path = "/list/hila")
+    public ResponseEntity<?> getProductsInWarehouse(@RequestParam Integer querytype){
+
+        return new ResponseEntity(batchService.getProductFromWarehouses(String.valueOf(querytype)), HttpStatus.CREATED);
     }
 
 }

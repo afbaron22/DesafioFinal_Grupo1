@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-@Validated
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -24,7 +24,6 @@ public class InboundOrderDTO {
     private LocalDate orderDate;
     @Valid
     private SectionDTO section;
-    @Valid
-    private List<BatchDTO> batchStock;
+    private List<@Valid BatchDTO> batchStock;
 
 }
