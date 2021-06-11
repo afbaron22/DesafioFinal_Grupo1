@@ -1,8 +1,11 @@
 package com.mercadolibre.demo_bootcamp_spring.services;
 
 import com.mercadolibre.demo_bootcamp_spring.dtos.OrderDTO;
+import com.mercadolibre.demo_bootcamp_spring.dtos.ProductDTO;
+import com.mercadolibre.demo_bootcamp_spring.exceptions.OrderNotFoundException;
 import com.mercadolibre.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.mercadolibre.demo_bootcamp_spring.models.Batch;
+import com.mercadolibre.demo_bootcamp_spring.models.OrderProduct;
 import com.mercadolibre.demo_bootcamp_spring.models.Orders;
 import com.mercadolibre.demo_bootcamp_spring.models.Product;
 import com.mercadolibre.demo_bootcamp_spring.repository.BatchRepository;
@@ -20,8 +23,6 @@ public class OrdersService implements IOrderService{
     public ProductsRepository productsRepository;
     public BatchRepository batchRepository;
 
-
-
     public OrdersService(OrdersRepository ordersRepository, ProductsRepository productsRepository, BatchRepository batchRepository) {
         this.ordersRepository = ordersRepository;
         this.productsRepository = productsRepository;
@@ -30,64 +31,68 @@ public class OrdersService implements IOrderService{
 //TODO implementar logica del servicio
 
     @Override
+    //Dar de alta una orden con la lista de productos que componen la
+    //PurchaseOrder. Calcular el precio final, y devolverlo junto a un status
+    //code “201 CREATED”. Si no hay stock de un producto
+    //notificar la situación devolviendo un error por producto, no a nivel de orden.
 
+    //Recorrer todos los productos si no hay stock
+    //verificar vencimiento del producto no sea inferior a 3 semanas
+    //si agrego producto tengo que restar cantidad del stock actual
+    //para saber el stock y la fecha de vencimiento tengo que buscar los batchs relacionados a ese producto
+    //Calcular precio final
     public Double registerOrder(OrderDTO orderDTO ) throws ProductsOutOfStockException {
-        //Dar de alta una orden con la lista de productos que componen la
-        //PurchaseOrder. Calcular el precio final, y devolverlo junto a un status
-        //code “201 CREATED”. Si no hay stock de un producto
-        //notificar la situación devolviendo un error por producto, no a nivel de orden.
-
-
-        //Recorrer todos los productos si no hay stock
-        //verificar vencimiento del producto no sea inferior a 3 semanas
-        //si agrego producto tengo que restar cantidad del stock actual
-        //para saber el stock y la fecha de vencimiento tengo que buscar los batchs relacionados a ese producto
-        //Calcular precio final
 
         //TODO chequear que exista cantidad suficiente de cada producto, en caso negativo devolver lista de errores.
-        List<Double> prices = new ArrayList<>();
-        List<Product> products = new ArrayList<>();
-        List<String> errores = new ArrayList<>();
+        //TODO ver de cambiar nombre de la clase por purchaseOrder
+        List<OrderProduct> orderProductList = checkAndGetOrderProduct(orderDTO);
+        Double finalPrice = 0.0;
 
-        int numberOfDays = 21;
-        LocalDate date = LocalDate.now().plusDays(numberOfDays);
-
-        orderDTO.getProducts().forEach(orderProduct -> {
-            int stockAvailable = productStock(orderProduct.getProductId(), date);
-           if (stockAvailable >= orderProduct.getQuantity()){
-               Product repoProduct = productsRepository.findById(orderProduct.getProductId()).orElseThrow();
-               products.add(repoProduct);
-               prices.add(repoProduct.getPrice() * orderProduct.getQuantity());
-           } else {
-               errores.add(orderProduct.getProductId() + " has " + stockAvailable + " items available");
-           }
-        });
-
-        if (errores.size() > 0) {
-            String errorProducts = errores.stream().reduce("", (acum, error) -> acum + error + "\n");
-            throw new ProductsOutOfStockException("the following products are not available: \n" + errorProducts);
+        for(OrderProduct op : orderProductList){
+            finalPrice += op.getProduct().getPrice() * op.getQuantity();
         }
 
-        Double finalPrice = prices.stream().reduce(0.0, Double::sum);
-        //TODO ver de cambiar nombre de la clase por purchaseOrder
         Orders newOrder = new Orders();
         newOrder.setUser(orderDTO.getBuyerId());
-        newOrder.setProducts(products);
+        newOrder.setOrderProducts(orderProductList);
         newOrder.setCreatedAt(orderDTO.getDate().toString());
+
+        for(OrderProduct orderProduct : orderProductList){
+            orderProduct.setOrders(newOrder);
+        }
         newOrder = ordersRepository.save(newOrder);
-        //TODO consultar a JOHI si necesitamos el ID.
+        //TODO necesitamos el ID.
         return finalPrice;
     }
 
     @Override
-    public List<Product> getOrderDetail(Integer idOrder) {
-        //Mostrar productos en la orden.
-        return null;
+    public List<OrderProduct> getOrderDetail(Integer idOrder)   {
+
+       Optional<Orders> ordersOptional = ordersRepository.findById(idOrder);
+      if (ordersOptional.isEmpty()){
+          throw new OrderNotFoundException(idOrder);
+      }
+      return ordersOptional.get().getOrderProducts();
     }
 
     @Override
     public void updateOrder(Integer idOrder, OrderDTO orderDTO) {
         //Modificar orden existente. que sea de tipo carrito para modificar
+
+        List<OrderProduct> orderProductList = checkAndGetOrderProduct(orderDTO);
+
+        Optional<Orders> ordersOptional = ordersRepository.findById(idOrder);
+        if (ordersOptional.isEmpty()){
+            throw new OrderNotFoundException(idOrder);
+        }
+        Orders orderToUpdate = new Orders();
+        orderToUpdate = ordersOptional.get();
+        orderToUpdate.setOrderProducts(orderProductList);
+        orderToUpdate = ordersRepository.save(orderToUpdate);
+
+        for(OrderProduct orderProduct : orderProductList){
+            orderProduct.setOrders(orderToUpdate);
+        }
 
     }
 
@@ -105,4 +110,39 @@ public class OrdersService implements IOrderService{
         //TODO hacer la lógica bien
         return new Orders();
     }
+
+    public List<OrderProduct> checkAndGetOrderProduct(OrderDTO orderDTO){
+
+        List<Double> prices = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+        List<String> errores = new ArrayList<>();
+        List<OrderProduct> orderProductList = new ArrayList<>();
+        int numberOfDays = 21;
+        LocalDate date = LocalDate.now().plusDays(numberOfDays);
+
+        orderDTO.getProducts().forEach(orderProduct -> {
+            int stockAvailable = productStock(orderProduct.getProductId(), date);
+            if (stockAvailable >= orderProduct.getQuantity()){
+
+                Product repoProduct = productsRepository.findById(orderProduct.getProductId()).orElseThrow();
+                OrderProduct orderProduct1 = new OrderProduct();
+                orderProduct1.setProduct(repoProduct);
+                orderProduct1.setQuantity(orderProduct.getQuantity());
+                orderProductList.add(orderProduct1);
+
+                prices.add(repoProduct.getPrice() * orderProduct.getQuantity());
+            } else {
+                errores.add(orderProduct.getProductId() + " has " + stockAvailable + " items available");
+            }
+        });
+        if (errores.size() > 0) {
+            String errorProducts = errores.stream().reduce("", (acum, error) -> acum + error + "\n");
+            throw new ProductsOutOfStockException("the following products are not available: \n" + errorProducts);
+
+        } return orderProductList;
+    }
+
+
+
+
 }

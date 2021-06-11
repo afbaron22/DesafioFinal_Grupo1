@@ -67,4 +67,10 @@ public class ControllerExceptionHandler {
 		ErrorMessage errorMessage = new ErrorMessage(productsOutOfStockException.getMessage(), HttpStatus.BAD_REQUEST.value());
 		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(OrderNotFoundException.class)
+	public ResponseEntity<?> OrderNotFoundException(OrderNotFoundException orderNotFoundException){
+		ErrorMessage errorMessage = new ErrorMessage(orderNotFoundException.getMessage(), HttpStatus.BAD_REQUEST.value());
+		return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+	}
 }

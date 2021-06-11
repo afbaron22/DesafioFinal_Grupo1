@@ -27,13 +27,9 @@ public class Orders {
     private String user;
     private String createdAt;
 
-  @JoinTable(
-            name = "rel_order_products",
-            joinColumns = @JoinColumn(name = "FK_ORDER", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="FK_PRODUCT", nullable = false)
-    )
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Product> products;
+
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
+    private List<OrderProduct> orderProducts;
 
     public Integer getOrderId() {
         return orderId;
@@ -47,7 +43,7 @@ public class Orders {
         return createdAt;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<OrderProduct> getOrderProducts() {
+        return orderProducts;
     }
 }

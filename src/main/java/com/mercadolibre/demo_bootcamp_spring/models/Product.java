@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -20,4 +21,5 @@ public class Product {
     private String additionalInfo;
     private State state;
     private Double price;
+
 }
