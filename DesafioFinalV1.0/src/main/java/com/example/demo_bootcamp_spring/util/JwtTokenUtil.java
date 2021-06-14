@@ -23,6 +23,8 @@ public class JwtTokenUtil implements Serializable {
 	@Value("${jwt.secret}")
 	private String secret;
 
+	public JwtTokenUtil(){}
+
 	public JwtTokenUtil(String secret) {
 		this.secret= secret;
 	}
