@@ -1,6 +1,4 @@
 package com.example.demo_bootcamp_spring.services.Batch;
-
-
 import com.example.demo_bootcamp_spring.dtos.*;
 import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.models.Batch;
@@ -11,7 +9,6 @@ import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -179,7 +176,7 @@ public class BatchService implements IBatchService {
 
     private void compareBatch(Batch batch,BatchDTO batchDTO){
         batch.setCurrentTemperature(batchDTO.getCurrentTemperature());
-        batch.setMinimumTemperature(batchDTO.getMinimumTemperature());
+        batch.setMinimumTemperature(batchDTO.getMinimunTemperature());
         batch.setDueDate(batchDTO.getDueDate());
         batch.setManufacturingDate(batchDTO.getManufacturingDate());
         batch.setManufacturingTime(batchDTO.getManufacturingTime());
@@ -227,7 +224,7 @@ public class BatchService implements IBatchService {
     //------------------------------------------MÉTODO GETBATCHSTOCK--------------------------------------------------
     private BatchStock getBatchResponse(InboundOrderDTO inboundOrderDTO){
         return new BatchStock(inboundOrderDTO.getBatchStock().stream().map(x->{
-                    return new BatchResponse(x.getBatchNumber(),x.getProductId(),x.getCurrentTemperature(),x.getMinimumTemperature()
+                    return new BatchResponse(x.getBatchNumber(),x.getProductId(),x.getCurrentTemperature(),x.getMinimunTemperature()
                     ,x.getInitialQuantity(),x.getCurrentQuantity(),x.getManufacturingDate().toString(),x.getManufacturingTime().toString(),x.getDueDate().toString());
                     }).collect(Collectors.toList()));
     }
@@ -272,7 +269,7 @@ public class BatchService implements IBatchService {
     //------------------------------------------MÉTODO RETURNBATCH--------------------------------------------------
     private Batch returnBatch(BatchDTO batchDTO,InboundOrder inboundOrder){
         var productTest =productsRepository.findById(batchDTO.getProductId()).orElseThrow(()-> new NonExistentProductException());
-        var newBatch = new Batch(null,productTest,batchDTO.getCurrentTemperature(),batchDTO.getMinimumTemperature(),batchDTO.getDueDate(),batchDTO.getManufacturingDate(),batchDTO.getManufacturingTime(),batchDTO.getInitialQuantity(),batchDTO.getCurrentQuantity(),inboundOrder);
+        var newBatch = new Batch(null,productTest,batchDTO.getCurrentTemperature(),batchDTO.getMinimunTemperature(),batchDTO.getDueDate(),batchDTO.getManufacturingDate(),batchDTO.getManufacturingTime(),batchDTO.getInitialQuantity(),batchDTO.getCurrentQuantity(),inboundOrder);
         return newBatch;
     }
 

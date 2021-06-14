@@ -7,9 +7,10 @@ import com.example.demo_bootcamp_spring.models.ErrorMessage;
 import com.example.demo_bootcamp_spring.models.ValidationError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-
+@ControllerAdvice
 public class ApiExceptionControllerAdvice {
     @ExceptionHandler({NonExistentProductException.class})
     public ResponseEntity<?> handleResponseExceptions(RuntimeException runtimeException){

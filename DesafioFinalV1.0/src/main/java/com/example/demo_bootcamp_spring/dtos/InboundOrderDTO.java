@@ -20,8 +20,8 @@ public class InboundOrderDTO {
     private String orderNumber;
     @NotNull(message = "Order Date  is required")
     private LocalDate orderDate;
-    @Valid
-    private SectionDTO section;
+
+    private @Valid SectionDTO section;
 
     private List<@Valid BatchDTO> batchStock;
 

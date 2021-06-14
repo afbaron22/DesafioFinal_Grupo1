@@ -28,14 +28,14 @@ public class BatchDTO {
     private String batchNumber;
 
     @NotBlank(message = "Product Id cant be empty")
-    @Size(min = 3, max = 45, message = "The length of Product Id must be between 3 and 45 characters")
+    @Size(min = 1, max = 45, message = "The length of Product Id must be between 3 and 45 characters")
     private String productId;
 
     @NotNull(message = "Current Temperatura is required")
     private Float currentTemperature;
 
     @NotNull(message = "Minimum Temperatura is required")
-    private Float minimumTemperature;
+    private Float minimunTemperature;
 
     @NotNull(message = "Initial Quantity is required")
     private Integer initialQuantity;
