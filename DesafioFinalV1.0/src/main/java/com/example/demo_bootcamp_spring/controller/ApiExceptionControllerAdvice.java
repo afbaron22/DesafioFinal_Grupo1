@@ -50,6 +50,12 @@ public class ApiExceptionControllerAdvice {
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({ProductsOutOfStockException.class})
+    public ResponseEntity<?> handleProductsOutOfStockException(RuntimeException runtimeException){
+        ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
 
 
     @ExceptionHandler(ValidationErrorException.class)
