@@ -16,11 +16,13 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
     Optional<List<Batch>> findByInboundOrder(String idInbound);
 
     @Query("SELECT u FROM Batch u WHERE u.product.productId = ?1")
-    Optional<List<Batch>> findByProductId(String idInbound);
+    Optional<List<Batch>> findByProductId(String idProduct);
 
     @Query("SELECT u.inboundOrder.section.warehouseCode,sum(u.currentQuantity) FROM Batch u " +
             "WHERE u.product.productId = ?1 group by u.inboundOrder.section.warehouseCode")
-    Optional<List<Object[]>> findWarehousesWithProduct(String idInbound);
+    //Lista  de objetos {WarehouseCode,currentQuantity}
+    Optional<List<Object[]>> findWarehousesWithProduct(String idProduct);
+
 
     @Query("select b from Batch b join b.product p where p.productId = :productId and b.dueDate > :dueDate")
     List<Batch> findByProductIdAndDueDate(
