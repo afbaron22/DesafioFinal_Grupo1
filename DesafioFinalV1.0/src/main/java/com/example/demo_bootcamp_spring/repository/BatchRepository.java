@@ -3,13 +3,15 @@ package com.example.demo_bootcamp_spring.repository;
 import com.example.demo_bootcamp_spring.models.Batch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BatchRepository extends JpaRepository<Batch,Integer> {
+public interface BatchRepository extends JpaRepository<Batch, Integer> {
     @Query("SELECT u FROM Batch u WHERE u.inboundOrder.orderNumber = ?1")
     Optional<List<Batch>> findByInboundOrder(String idInbound);
 
@@ -19,4 +21,8 @@ public interface BatchRepository extends JpaRepository<Batch,Integer> {
     @Query("SELECT u.inboundOrder.section.warehouseCode,sum(u.currentQuantity) FROM Batch u " +
             "WHERE u.product.productId = ?1 group by u.inboundOrder.section.warehouseCode")
     Optional<List<Object[]>> findWarehousesWithProduct(String idInbound);
+
+    @Query("select b from Batch b join b.product p where p.productId = :productId and b.dueDate > :dueDate")
+    List<Batch> findByProductIdAndDueDate(
+            @Param("productId")String productId, @Param("dueDate") LocalDate dueDate);
 }
