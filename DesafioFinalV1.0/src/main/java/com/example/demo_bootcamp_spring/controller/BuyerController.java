@@ -30,10 +30,10 @@ public class BuyerController {
         return new ResponseEntity(productService.getProducts(), HttpStatus.OK);
     }
 
-    /*@GetMapping("/list")
+    @GetMapping("/listProduct")
     public ResponseEntity<?> getProductsByCategory(@Valid @RequestParam State productCategory){
         return new ResponseEntity(productService.getProductsByCategory(productCategory), HttpStatus.OK);
-    }*/
+    }
 
     @PostMapping("/orders")
     public ResponseEntity<?> registerOrder(@Valid @RequestBody OrderDTO orderDTO){

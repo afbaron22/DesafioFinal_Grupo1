@@ -55,7 +55,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.authorizeRequests()
                         .antMatchers(HttpMethod.POST,"/auth", "/register").permitAll()
                         .antMatchers("/h2-console/**").permitAll()
-                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/**").hasRole("REPRESENTATIVE")
+                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/inboundorder").hasRole("REPRESENTATIVE")
+                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/list").hasRole("REPRESENTATIVE")
+                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/warehouse").hasRole("REPRESENTATIVE")
+                        .antMatchers("/api/v1/fresh-products/orders").hasRole("BUYER")
+                        .antMatchers(HttpMethod.GET, "/api/v1/fresh-products").hasRole("BUYER")
+                        .antMatchers(HttpMethod.GET, "/api/v1/fresh-products/listProduct").hasRole("BUYER")
                         .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);;
 
