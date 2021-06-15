@@ -16,24 +16,11 @@ import java.util.List;
 
 @ControllerAdvice
 public class ApiExceptionControllerAdvice {
-    @ExceptionHandler(ProductsOutOfStockException.class)
-    public ResponseEntity<?> ProductOutOfStockException(ProductsOutOfStockException productsOutOfStockException){
-        ErrorMessage errorMessage = new ErrorMessage(productsOutOfStockException.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<?> OrderNotFoundException(OrderNotFoundException orderNotFoundException){
-        ErrorMessage errorMessage = new ErrorMessage(orderNotFoundException.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler({NonExistentProductException.class})
     public ResponseEntity<?> handleResponseExceptions(RuntimeException runtimeException){
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler({ExistingInboundOrderId.class})
     public ResponseEntity<?> handleResponseExceptionsExistingInboundOrderId(RuntimeException runtimeException){
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
@@ -51,7 +38,6 @@ public class ApiExceptionControllerAdvice {
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler({NotExistingBatch.class})
     public ResponseEntity<?> handleNotExistingBatch(RuntimeException runtimeException){
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
@@ -63,6 +49,14 @@ public class ApiExceptionControllerAdvice {
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({ProductsOutOfStockException.class})
+    public ResponseEntity<?> handleProductsOutOfStockException(RuntimeException runtimeException){
+        ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+
 
     @ExceptionHandler(ValidationErrorException.class)
     public ResponseEntity<?> ValidationErrorException(ValidationErrorException validationErrorException){
