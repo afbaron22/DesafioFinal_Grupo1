@@ -2,6 +2,10 @@ package com.example.demo2.Unit.BatchService;
 
 
 import com.example.demo2.dtos.*;
+import com.example.demo2.exceptions.ExistingInboundOrderId;
+import com.example.demo2.exceptions.NonExistentProductException;
+import com.example.demo2.exceptions.NotExistingBatch;
+import com.example.demo2.exceptions.NotFoundInboundOrderId;
 import com.example.demo2.models.*;
 import com.example.demo2.repository.BatchRepository;
 import com.example.demo2.repository.InboundOrderRepository;
@@ -21,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -49,6 +55,8 @@ public class BatchServiceTest {
     }
 
 
+    //------------------------------------------TESTS METHOD SAVEBATCH--------------------------------------------------
+
     @Test
     void whenReceiveOkInboundOrderTransaction_thenSaveBatch() {
         when(productsRepository.findById(inboundOrderTransaction.getInboundOrder().getBatchStock().get(0).getProductId())).thenReturn(createProduct());
@@ -63,13 +71,36 @@ public class BatchServiceTest {
         assertEquals("2021-07-01", batchStock.getBatchStock().get(0).getDueDate());
         assertEquals(5, batchStock.getBatchStock().get(0).getCurrentTemperature());
         assertEquals(10, batchStock.getBatchStock().get(0).getMinimumTemperature());
-
-
     }
 
+
+    //TODO hacer saltar excepcion GetExistingInboundOrderId
+//    @Test
+//    void shouldGetExistingInboundOrderId() {
+//
+//        when(inboundOrderRepository.findById(inboundOrderTransaction.getInboundOrder().getOrderNumber()).isPresent()).thenReturn(true);
+//
+//        assertThrows(ExistingInboundOrderId.class, () -> {
+//            batchService.saveBatch(inboundOrderTransaction);
+//        });
+//    }
+    
+
     @Test
+    void shouldGetNonExistentProductException() {
+        Optional<Product> optionalProduct = Optional.empty();
+
+        when(productsRepository.findById(inboundOrderTransaction.getInboundOrder().getBatchStock().get(0).getProductId())).thenReturn(optionalProduct);
+
+        assertThrows(NonExistentProductException.class, () -> {
+            batchService.saveBatch(inboundOrderTransaction);
+        });
+    }
+
+    //------------------------------------------TESTS METHOD PUTBATCH--------------------------------------------------
+    @Test
+
     void whenReceiveOkInboundOrderTransaction_thenPutBatch() {
-        when(productsRepository.findById(inboundOrderTransaction.getInboundOrder().getBatchStock().get(0).getProductId())).thenReturn(createProduct());
         when(inboundOrderRepository.findById(inboundOrderTransaction.getInboundOrder().getOrderNumber())).thenReturn(createInboundOrder());
         when(batchRepository.findByInboundOrder(inboundOrderTransaction.getInboundOrder().getOrderNumber())).thenReturn(createListBatch());
         BatchStock batchStock = batchService.putBatch(inboundOrderTransaction);
@@ -85,8 +116,32 @@ public class BatchServiceTest {
         assertEquals(5, batchStock.getBatchStock().get(0).getCurrentTemperature());
         assertEquals(10, batchStock.getBatchStock().get(0).getMinimumTemperature());
 
-
     }
+
+    @Test
+    void shouldGetNotFoundInboundOrderId() {
+        Optional<InboundOrder> optionalInboundOrder = Optional.empty();
+        when(inboundOrderRepository.findById(inboundOrderTransaction.getInboundOrder().getBatchStock().get(0).getProductId())).thenReturn(optionalInboundOrder);
+
+        assertThrows(NotFoundInboundOrderId.class, () -> {
+            batchService.putBatch(inboundOrderTransaction);
+        });
+    }
+
+    @Test
+    void shouldGetNotExistingBatch() {
+        Optional<List<Batch>> optionalBatches = Optional.empty();
+        when(inboundOrderRepository.findById(inboundOrderTransaction.getInboundOrder().getOrderNumber())).thenReturn(createInboundOrder());
+        when(batchRepository.findByInboundOrder(inboundOrderTransaction.getInboundOrder().getOrderNumber())).thenReturn(optionalBatches);
+
+
+        assertThrows(NotExistingBatch.class, () -> {
+            batchService.putBatch(inboundOrderTransaction);
+        });
+    }
+
+
+
 
 
     private InboundOrderDTO createInboundOrderDTO() {
@@ -104,6 +159,7 @@ public class BatchServiceTest {
         return inboundOrderDTO;
 
     }
+
 
     private InboundOrderTransaction createInboundOrderTransaction() {
         return new InboundOrderTransaction(createInboundOrderDTO());
