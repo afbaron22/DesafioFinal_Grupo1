@@ -26,6 +26,7 @@ public class BatchController {
         }
         return new ResponseEntity(batchService.saveBatch(inboundOrder), HttpStatus.CREATED);
     }
+
     @PutMapping("/inboundorder")
     public ResponseEntity<?> putBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
@@ -33,15 +34,16 @@ public class BatchController {
         }
         return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
-    @GetMapping(path = "/list")
-    public ResponseEntity<?> getProduct(@RequestParam Integer querytype,@RequestParam(required = false) String ordBy){
 
+    @GetMapping(path = "/list")
+    public ResponseEntity<?> getProduct(@RequestParam Integer querytype, @RequestParam(required = false) String ordBy){
         return new ResponseEntity(batchService.getProductFromBatches(String.valueOf(querytype), ordBy), HttpStatus.CREATED);
     }
+
     @GetMapping(path = "/warehouse")
     public ResponseEntity<?> getProductsInWarehouse(@RequestParam Integer querytype){
-
         return new ResponseEntity(batchService.getProductFromWarehouses(String.valueOf(querytype)), HttpStatus.CREATED);
     }
+
 }
 

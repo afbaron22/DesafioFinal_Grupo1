@@ -131,7 +131,7 @@ public class BatchService implements IBatchService {
      */
     //---------------------------------------MÉTODO PROCESSLIST--------------------------------------------------
     private List<BatchStockProduct> processList(List<Batch> list, String ordBy){
-        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate)) return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
+        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate) && x.getDueDate().isAfter(currentDate.plusWeeks(3))) return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
             return null;}).collect(Collectors.toList());
         while (listFound.remove(null)) {}
         if(ordBy.equals("L"))
