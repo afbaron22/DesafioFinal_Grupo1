@@ -24,4 +24,9 @@ public class Account {
     @Column
     private String role;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="warehouse_id", referencedColumnName = "idWarehouse")
+    private Warehouse warehouse;
+
+
 }

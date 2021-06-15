@@ -21,6 +21,9 @@ public class Warehouse {
     private String location;
     private String province;
 
+    @OneToOne(mappedBy = "Warehouses")
+    private Account account;
+
 /*
     @JoinTable(
             name = "rel_warehouse_products",
