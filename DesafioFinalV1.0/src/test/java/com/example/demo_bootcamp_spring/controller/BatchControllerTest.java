@@ -56,4 +56,5 @@ public class BatchControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(new ObjectMapper().writeValueAsString(warehouseProducts)));
     }
+    
 }
