@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -27,13 +28,8 @@ public class Orders {
     private String user;
     private String createdAt;
 
-  /*  @JoinTable(
-            name = "rel_order_products",
-            joinColumns = @JoinColumn(name = "FK_ORDER", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="FK_PRODUCT", nullable = false)
-    )
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Product> products*/;
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderProduct> orderProducts;
 
     private InetAddress getUserAdd() throws IOException {
         Socket socket = new Socket();
