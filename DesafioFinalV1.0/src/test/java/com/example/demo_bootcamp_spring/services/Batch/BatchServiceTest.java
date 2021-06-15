@@ -76,7 +76,7 @@ class BatchServiceTest {
 
 
     private Product createProduct(){
-        return new Product("productTest","productName","test",State.FS);
+        return new Product("productTest","productName","test",State.FS, 4000.0);
     }
 
     private InboundOrder createInboundOrder(){
