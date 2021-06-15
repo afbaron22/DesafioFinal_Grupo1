@@ -18,5 +18,6 @@ public interface BatchRepository extends JpaRepository<Batch,Integer> {
 
     @Query("SELECT u.inboundOrder.section.warehouseCode,sum(u.currentQuantity) FROM Batch u " +
             "WHERE u.product.productId = ?1 group by u.inboundOrder.section.warehouseCode")
-    Optional<List<Object[]>> findWarehousesWithProduct(String idInbound);
+    //Lista  de objetos {WarehouseCode,currentQuantity}
+    Optional<List<Object[]>> findWarehousesWithProduct(String idProduct);
 }

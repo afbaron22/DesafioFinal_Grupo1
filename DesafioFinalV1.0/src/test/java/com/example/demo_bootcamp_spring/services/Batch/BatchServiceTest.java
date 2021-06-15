@@ -1,10 +1,12 @@
 package com.example.demo_bootcamp_spring.services.Batch;
 import com.example.demo_bootcamp_spring.dtos.BatchStockProduct;
 import com.example.demo_bootcamp_spring.dtos.BatchStockProductSearch;
+import com.example.demo_bootcamp_spring.dtos.SearchedWarehouseProducts;
 import com.example.demo_bootcamp_spring.dtos.SectionDTO;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,9 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -54,6 +54,26 @@ class BatchServiceTest {
     public void shouldGetProductsFromBatchesOrderByExpirationDate(){
 
     }
+
+    @Test
+    public void shoudGetProductFromWarehouse(){
+
+        List<Map<String,String>> expectedWarehouses = new ArrayList<>();
+        Map<String,String> expectedWarehouse = new HashMap<>();
+        expectedWarehouse.put("totalQuantity","123");
+        expectedWarehouse.put("warehousecode","1");
+        expectedWarehouses.add(expectedWarehouse);
+        SearchedWarehouseProducts expectedWarehouseProducts = new SearchedWarehouseProducts();
+        expectedWarehouseProducts.setWarehouses(expectedWarehouses);
+        expectedWarehouseProducts.setProductId("1");
+
+        List<Object[]> warehouses = new ArrayList<>();
+        Object[] warehouseQuantity = {"1","123"};
+        warehouses.add(warehouseQuantity);
+        when(batchRepository.findWarehousesWithProduct("1")).thenReturn(Optional.of(warehouses));
+        assertEquals(expectedWarehouseProducts,batchService.getProductFromWarehouses("1"));
+    }
+
 
     private Product createProduct(){
         return new Product("productTest","productName","test",State.FS);
