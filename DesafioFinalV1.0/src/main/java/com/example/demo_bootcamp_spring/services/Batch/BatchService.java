@@ -120,6 +120,13 @@ public class BatchService implements IBatchService {
         return new SearchedWarehouseProducts(idProducto,warehouseList);
     }
 
+    @Override
+    public BatchStock getBatchesInWarehouseByDueDate(Integer idWarehouse, LocalDate days) {
+        BatchStock batchStock = new BatchStock();
+        Optional<List<Batch>> batcheslist = batchRepository.findBatchesInWarehouseByDueDate(idWarehouse, days);
+        return batchStock;
+    }
+
     /**MÉTODO PROCESSLIST
      * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran
      * los productos que no esten vencidos. Este método recibe dos parametros , la lista a procesar y el parametro de
