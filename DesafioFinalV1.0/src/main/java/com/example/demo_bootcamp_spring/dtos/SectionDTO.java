@@ -20,6 +20,5 @@ public class SectionDTO {
     private State sectionCode;
 
     @NotBlank(message = "Warehouse Code cant be empty")
-    @Size(min = 1, max = 45, message = "The length of Warehouse Code must be between 1 and 45 characters")
     private String warehouseCode;
 }

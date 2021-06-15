@@ -20,18 +20,14 @@ public class BatchController {
     }
 
     @PostMapping("/inboundorder")
-    public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult) throws Exception{
-        if (bindingResult.hasErrors()) {
-            throw new ValidationErrorException(bindingResult.getFieldError().getField(),bindingResult.getAllErrors().get(0).getDefaultMessage());
-        }
+    public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder) throws Exception{
+
         return new ResponseEntity(batchService.saveBatch(inboundOrder), HttpStatus.CREATED);
     }
 
     @PutMapping("/inboundorder")
-    public ResponseEntity<?> putBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            throw new ValidationErrorException(bindingResult.getFieldError().getField(),bindingResult.getAllErrors().get(0).getDefaultMessage());
-        }
+    public ResponseEntity<?> putBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder){
+
         return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
 

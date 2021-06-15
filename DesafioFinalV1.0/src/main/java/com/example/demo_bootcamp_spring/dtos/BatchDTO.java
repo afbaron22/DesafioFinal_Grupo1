@@ -25,18 +25,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BatchDTO {
 
-    @NotNull(message = "Batch Number is required")
+    @NotBlank(message = "Batch Number is required")
     private String batchNumber;
 
     @NotBlank(message = "Product Id cant be empty")
-    @Size(min = 1, max = 45, message = "The length of Product Id must be between 3 and 45 characters")
     private String productId;
 
-    @NotNull(message = "Current Temperatura is required")
+    @NotNull(message = "Current Temperature is required")
     private Float currentTemperature;
 
-    @NotNull(message = "Minimum Temperatura is required")
-    private Float minimunTemperature;
+    @NotNull(message = "Minimum Temperature is required")
+    private Float minimumTemperature;
 
     @NotNull(message = "Initial Quantity is required")
     private Integer initialQuantity;
