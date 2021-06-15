@@ -30,7 +30,7 @@ public class BuyerController {
         return new ResponseEntity(productService.getProducts(), HttpStatus.OK);
     }
 
-    @GetMapping("/listProduct")
+    @GetMapping("/listOrder")
     public ResponseEntity<?> getProductsByCategory(@Valid @RequestParam State productCategory){
         return new ResponseEntity(productService.getProductsByCategory(productCategory), HttpStatus.OK);
     }
