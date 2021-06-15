@@ -43,5 +43,6 @@ public class BatchController {
 
         return new ResponseEntity(batchService.getProductFromWarehouses(String.valueOf(querytype)), HttpStatus.CREATED);
     }
+
 }
 
