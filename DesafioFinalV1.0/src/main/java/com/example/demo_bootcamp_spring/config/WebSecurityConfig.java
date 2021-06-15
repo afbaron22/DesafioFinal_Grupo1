@@ -55,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.authorizeRequests()
                         .antMatchers(HttpMethod.POST,"/auth", "/register").permitAll()
                         .antMatchers("/h2-console/**").permitAll()
-                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/inboundorder").hasRole("REPRESENTATIVE")
+                        .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/**").hasRole("REPRESENTATIVE")
                         .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);;
 
