@@ -11,18 +11,19 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="user")
-public class Account {
+@Table(name="Employee")
+public class Employee {
+
     @Id
-    @Column(name="idAccount")
+    @Column(name="idEmployee")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
-    private String username;
-    @Column
-    @JsonIgnore
-    private String password;
-    @Column
-    private String role;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idAccount")
+    private Account user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idWarehouse")
+    private Warehouse warehouse;
 }

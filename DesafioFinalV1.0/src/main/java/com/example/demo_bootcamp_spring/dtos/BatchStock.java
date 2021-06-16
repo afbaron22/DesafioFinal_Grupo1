@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BatchStock {
-    private List<BatchResponse> batchStock;
+    private List<Object> batchStock;
 }

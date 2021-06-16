@@ -23,8 +23,11 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
     //Lista  de objetos {WarehouseCode,currentQuantity}
     Optional<List<Object[]>> findWarehousesWithProduct(String idProduct);
 
-
     @Query("select b from Batch b join b.product p where p.productId = :productId and b.dueDate > :dueDate")
     List<Batch> findByProductIdAndDueDate(
             @Param("productId")String productId, @Param("dueDate") LocalDate dueDate);
+
+    @Query("SELECT b FROM Batch b WHERE b.inboundOrder.section.warehouseCode = :warehouseCode" +
+            " and b.dueDate < CURRENT_DATE and b.dueDate > CURRENT_DATE")
+    Optional<List<Batch>> findBatchesInWarehouseByDueDate(@Param("warehouseCode") Integer warehouseCode, @Param("days") LocalDate days);
 }
