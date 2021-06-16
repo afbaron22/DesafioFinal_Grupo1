@@ -33,7 +33,6 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
     @Query("SELECT u.product FROM Batch u WHERE u.product.state = :state")
     Optional<List<Product>> findProduct(@Param("state") State state);
 
-    /*@Query("SELECT u FROM Batch u WHERE u.inboundOrder.section.warehouseCode = :idWarehouse")
+    @Query("SELECT u FROM Batch u WHERE u.inboundOrder.section.warehouseCode = :idWarehouse")
     Optional<List<Batch>> findProductDueDate(@Param("idWarehouse") String idWarehouse);
-*/
 }

@@ -122,24 +122,30 @@ public class BatchService implements IBatchService {
         return new SearchedWarehouseProducts(idProducto,warehouseList);
     }
 
-
-/*    public BatchStock getBatchesInWarehouseByDueDate(Integer idWarehouse, int days) {
-        BatchStock batchStock = new BatchStock();
-        var limitDate =  currentDate.plusDays(5);
+    /**
+     * Este método se encarga de revisar en un warehouse asociado los productos que van a vencer en un determiando
+     * rango de tiempo proporcionado por el usuario. El método consiste es delimitar dos fechas en las cuales
+     * puede vencer un producto y traer el bache asociado a este.
+     * @param idWarehouse
+     * @param days
+     * @return
+     */
+    //---------------------------------------MÉTODO GETBATCHESINWAREHOUSEBYDUEDATE--------------------------------------------------
+    public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, int days) {
+        var limitDate =  currentDate.plusDays(days);
         var todayDate = currentDate.minusDays(1);
-
-
-
-        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow();
-        var listProductos = lista.stream().map(x->{
+        Map<String,Object> batchStock = new HashMap<>();
+        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        var listBatch = lista.stream().map(x->{
            if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
-               return x.getProduct();
-           }
-           return null;
-        }).collect(Collectors.toList());
-        while (listProductos.remove(null)) {}
-        return batchStock;
-    }*/
+               batchStock.put("batchNumber",x.getBatchNumber());
+               batchStock.put("productId",x.getProduct().getProductId());
+               batchStock.put("dueDate",x.getDueDate());
+               batchStock.put("quantity",x.getCurrentQuantity());
+               return batchStock; }return null; }).collect(Collectors.toList());
+        while (listBatch.remove(null)) {}
+        return new BatchStockWareHouse(listBatch);
+    }
 
     /**MÉTODO PROCESSLIST
      * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran
