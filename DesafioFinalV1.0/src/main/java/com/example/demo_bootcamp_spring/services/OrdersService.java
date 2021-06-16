@@ -2,6 +2,8 @@ package com.example.demo_bootcamp_spring.services;
 
 import com.example.demo_bootcamp_spring.dtos.InboundOrderDTO;
 import com.example.demo_bootcamp_spring.dtos.OrderDTO;
+import com.example.demo_bootcamp_spring.dtos.OrderDetailDTO;
+import com.example.demo_bootcamp_spring.dtos.OrderProductDetailDTO;
 import com.example.demo_bootcamp_spring.exceptions.OrderNotFoundException;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.Batch;
@@ -15,6 +17,7 @@ import com.example.demo_bootcamp_spring.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,13 +72,18 @@ public class OrdersService implements IOrderService {
     }
 
     @Override
-    public Set<OrderProduct> getOrderDetail(Integer idOrder)   {
+    public OrderDetailDTO getOrderDetail(Integer idOrder)   {
 
-        Optional<Orders> ordersOptional = ordersRepository.findById(idOrder);
-        if (ordersOptional.isEmpty()){
+       OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+        List<OrderProductDetailDTO> orderProductDetailList = new ArrayList<>();
+        Optional<List<OrderProductDetailDTO>> optionalOrderProductDetailList = ordersRepository.getProductsInOrder(idOrder);
+        if (optionalOrderProductDetailList.isEmpty()){
             throw new OrderNotFoundException(idOrder);
         }
-        return new HashSet(ordersOptional.get().getOrderProducts());
+        orderProductDetailList = optionalOrderProductDetailList.get();
+        orderDetailDTO.setOrderId(idOrder);
+        orderDetailDTO.setOrderProducts(orderProductDetailList);
+        return orderDetailDTO;
     }
 
     @Override

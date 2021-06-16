@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/fresh-products/inboundorder").hasRole("REPRESENTATIVE")
                 .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/list").hasRole("REPRESENTATIVE")
                 .antMatchers(HttpMethod.POST, "/api/v1/fresh-products/warehouse").hasRole("REPRESENTATIVE")
-                .antMatchers("/api/v1/fresh-products/orders").hasRole("BUYER")
+                .antMatchers("/api/v1/fresh-products/orders**").hasRole("BUYER")
                 .antMatchers(HttpMethod.GET, "/api/v1/fresh-products").hasRole("BUYER")
                 .antMatchers(HttpMethod.GET, "/api/v1/fresh-products/listOrder").hasRole("BUYER")
                 .antMatchers(HttpMethod.GET, "/api/v1/fresh-products/listProduct").hasRole("BUYER")
@@ -66,7 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("api/v1/fresh-products/due-date").hasRole("REPRESENTATIVE")
                 .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        ;
+        
+
 
         httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();

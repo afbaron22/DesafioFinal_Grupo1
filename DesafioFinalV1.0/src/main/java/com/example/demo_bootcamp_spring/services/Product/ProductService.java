@@ -38,7 +38,7 @@ public class ProductService implements IProductService {
         List<Product> list = batchRepository
             .findProduct(state)
             .orElseThrow(()-> new ProductsOutOfStockException("No products where found in the category: " + state.toString()));
-        
+
         if(list.isEmpty()){
             throw new ProductsOutOfStockException("No products where found in the category: " + state.toString());
         }
