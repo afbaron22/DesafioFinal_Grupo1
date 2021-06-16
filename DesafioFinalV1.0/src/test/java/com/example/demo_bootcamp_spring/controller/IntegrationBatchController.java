@@ -2,13 +2,11 @@ package com.example.demo_bootcamp_spring.controller;
 
 import com.example.demo_bootcamp_spring.dtos.*;
 import com.example.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
-import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.services.Batch.BatchService;
 import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
 import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import com.google.gson.Gson;
-import io.jsonwebtoken.Header;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,12 +24,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -53,10 +48,6 @@ public class IntegrationBatchController {
 
     @MockBean
     private BatchService batchService;
-    @InjectMocks
-    private JwtTokenUtil jwtTokenUtil;
-
-
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
@@ -65,9 +56,10 @@ public class IntegrationBatchController {
     @BeforeEach
     public void setUp() {
         inboundOrderTransactionRequest = createInboundOrderTransactionRequest();
+        jwtTokenUtil = new JwtTokenUtil("secret");
     }
 
-   //------------------------------------------TESTS POST METHOD SAVEBATCH--------------------------------------------------
+    //------------------------------------------TESTS POST METHOD SAVEBATCH--------------------------------------------------
     @Test
     void testInsertBatch_whenReceiveAInboundOrderTransactionOK_thenReturnOkWithBatchStock() throws Exception {
         BatchStock batchStockResponse = createBatchStock();
@@ -78,9 +70,8 @@ public class IntegrationBatchController {
 
         this.mockMvc.perform(
                 post("/api/v1/fresh-products/inboundorder")
-                        .header("Authorization","Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization","Bearer token " + jwtTokenUtil.generateToken(userDetails))
+                        .header("Authorization",jwtTokenUtil.generateToken(userDetails))
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.batchStock.[0].batchNumber").value("1"))
@@ -414,8 +405,6 @@ public class IntegrationBatchController {
     private class InboundOrderTransactionRequest {
         private InboundOrderDTORequest inboundOrder;
     }
-
-
 
 
 }
