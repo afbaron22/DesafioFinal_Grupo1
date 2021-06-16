@@ -27,12 +27,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -54,10 +52,6 @@ public class IntegrationBatchController {
     @MockBean
     private BatchService batchService;
     @InjectMocks
-    private JwtTokenUtil jwtTokenUtil;
-
-
-    @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
     private InboundOrderTransactionRequest inboundOrderTransactionRequest;
@@ -414,8 +408,6 @@ public class IntegrationBatchController {
     private class InboundOrderTransactionRequest {
         private InboundOrderDTORequest inboundOrder;
     }
-
-
 
 
 }
