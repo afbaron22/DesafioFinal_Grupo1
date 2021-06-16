@@ -34,9 +34,9 @@ public class BatchController {
         return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
     @GetMapping(path = "/list")
-    public ResponseEntity<?> getProduct(@RequestParam Integer querytype,@RequestParam(required = false) String ordBy){
+    public ResponseEntity<?> getProduct(@RequestParam String querytype,@RequestParam(required = false) String ordBy){
 
-        return new ResponseEntity(batchService.getProductFromBatches(String.valueOf(querytype), ordBy), HttpStatus.CREATED);
+        return new ResponseEntity(batchService.getProductFromBatches(querytype, ordBy), HttpStatus.CREATED);
     }
     @GetMapping(path = "/warehouse")
     public ResponseEntity<?> getProductsInWarehouse(@RequestParam Integer querytype){
