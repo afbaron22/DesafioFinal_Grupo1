@@ -27,20 +27,7 @@ public class Orders {
     private Integer orderId;
     private String user;
     private String createdAt;
-
+    private OrderStatus orderStatus;
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderProduct> orderProducts;
-
-    private InetAddress getUserAdd() throws IOException {
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress("google.com", 80));
-        return socket.getLocalAddress();
-    }
-
-    private String getDate(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        return dtf.format(now).toString();
-
-    }
 }
