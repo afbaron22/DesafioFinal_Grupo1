@@ -8,6 +8,7 @@ import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
@@ -120,6 +121,25 @@ public class BatchService implements IBatchService {
             return warehouses; }).collect(Collectors.toList());
         return new SearchedWarehouseProducts(idProducto,warehouseList);
     }
+
+
+/*    public BatchStock getBatchesInWarehouseByDueDate(Integer idWarehouse, int days) {
+        BatchStock batchStock = new BatchStock();
+        var limitDate =  currentDate.plusDays(5);
+        var todayDate = currentDate.minusDays(1);
+
+
+
+        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow();
+        var listProductos = lista.stream().map(x->{
+           if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
+               return x.getProduct();
+           }
+           return null;
+        }).collect(Collectors.toList());
+        while (listProductos.remove(null)) {}
+        return batchStock;
+    }*/
 
     /**MÉTODO PROCESSLIST
      * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran

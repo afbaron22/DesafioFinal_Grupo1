@@ -9,4 +9,5 @@ public interface IBatchService {
     BatchStock putBatch(InboundOrderTransaction inboundOrder);
     BatchStockProductSearch getProductFromBatches(String idProducto,String ordBy);
     SearchedWarehouseProducts getProductFromWarehouses(String idProducto);
+
 }
