@@ -1,5 +1,6 @@
 package com.example.demo_bootcamp_spring.controller;
 import com.example.demo_bootcamp_spring.dtos.InboundOrderTransaction;
+import com.example.demo_bootcamp_spring.exceptions.NotAuthorizedUser;
 import com.example.demo_bootcamp_spring.services.Batch.IBatchService;
 import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
@@ -21,15 +22,19 @@ public class BatchController {
 
     @PostMapping("/inboundorder")
     public ResponseEntity<?> insertBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder, @RequestHeader("Authorization") String token ) throws Exception{
-
-    String jwtToken = token.substring(7);
-    String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        String jwtToken = token.substring(7);
+        var res = String.valueOf(batchService.validate(jwtTokenUtil.getUsernameFromToken(jwtToken)));
+        if(!res.equals(inboundOrder.getInboundOrder().getSection().getWarehouseCode()))
+            throw new NotAuthorizedUser();
         return new ResponseEntity(batchService.saveBatch(inboundOrder), HttpStatus.CREATED);
     }
 
     @PutMapping("/inboundorder")
-    public ResponseEntity<?> putBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder){
-
+    public ResponseEntity<?> putBatch(@Valid @RequestBody InboundOrderTransaction inboundOrder,@RequestHeader("Authorization") String token){
+        String jwtToken = token.substring(7);
+        var res = String.valueOf(batchService.validate(jwtTokenUtil.getUsernameFromToken(jwtToken)));
+        if(!res.equals(inboundOrder.getInboundOrder().getSection().getWarehouseCode()))
+            throw new NotAuthorizedUser();
         return new ResponseEntity(batchService.putBatch(inboundOrder), HttpStatus.CREATED);
     }
 

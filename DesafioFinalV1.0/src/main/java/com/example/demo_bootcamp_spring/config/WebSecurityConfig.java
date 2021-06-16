@@ -63,6 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/fresh-products/listOrder").hasRole("BUYER")
                 .antMatchers(HttpMethod.GET, "/api/v1/fresh-products/listProduct").hasRole("BUYER")
                 .antMatchers("/api/v1/fresh-products/orders").hasRole("BUYER")
+                .antMatchers("api/v1/fresh-products/due-date").hasRole("REPRESENTATIVE")
                 .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         ;

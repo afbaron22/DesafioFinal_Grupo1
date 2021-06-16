@@ -4,10 +4,7 @@ import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.models.Batch;
 import com.example.demo_bootcamp_spring.models.InboundOrder;
 import com.example.demo_bootcamp_spring.models.Section;
-import com.example.demo_bootcamp_spring.repository.BatchRepository;
-import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
-import com.example.demo_bootcamp_spring.repository.ProductsRepository;
-import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import com.example.demo_bootcamp_spring.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -21,6 +18,7 @@ public class BatchService implements IBatchService {
     SectionRepository sectionRepository;
     BatchRepository batchRepository;
     ProductsRepository productsRepository;
+    UserRepository userRepository;
     private LocalDate currentDate = LocalDate.now();
     /**CONSTRUCTOR
      * Contructor encargado de inyectar las dependencias de los repositorios.
@@ -29,11 +27,17 @@ public class BatchService implements IBatchService {
      * @param batchRepository
      * @param productsRepository
      */
-    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository) {
+    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository,UserRepository userRepository) {
         this.inboundOrderRepository = inboundOrderRepository;
         this.sectionRepository      = sectionRepository;
         this.batchRepository        = batchRepository;
         this.productsRepository     = productsRepository;
+        this.userRepository         = userRepository;
+    }
+
+    public Integer validate(String userName){
+        var user = userRepository.findByUsername(userName);
+        return user.getWarehouse().getIdWarehouse();
     }
     /**MÉTODO SAVEBATCH
      *Este método se encarga de guardar en persistencia un InboundOrderTransaction, este es un objecto que el
@@ -47,6 +51,7 @@ public class BatchService implements IBatchService {
     //------------------------------------------MÉTODO SAVEBATCH--------------------------------------------------
 
     public BatchStock saveBatch(InboundOrderTransaction inboundOrder){
+
         var inboundOrderDTO = inboundOrder.getInboundOrder();
         if(existInboundOrder(inboundOrderDTO))
             throw new ExistingInboundOrderId();

@@ -21,6 +21,12 @@ public class ApiExceptionControllerAdvice {
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler({NotAuthorizedUser.class})
+    public ResponseEntity<?> handleResponseExceptionsNotAuthorizedUser(RuntimeException runtimeException){
+        ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({ExistingInboundOrderId.class})
     public ResponseEntity<?> handleResponseExceptionsExistingInboundOrderId(RuntimeException runtimeException){
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());

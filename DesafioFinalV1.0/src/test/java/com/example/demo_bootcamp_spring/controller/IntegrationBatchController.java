@@ -52,7 +52,7 @@ public class IntegrationBatchController {
         inboundOrderTransactionRequest = createInboundOrderTransactionRequest();
     }
 
-    //------------------------------------------TESTS POST METHOD SAVEBATCH--------------------------------------------------
+   //------------------------------------------TESTS POST METHOD SAVEBATCH--------------------------------------------------
     @Test
     void testInsertBatch_whenReceiveAInboundOrderTransactionOK_thenReturnOkWithBatchStock() throws Exception {
         BatchStock batchStockResponse = createBatchStock();
