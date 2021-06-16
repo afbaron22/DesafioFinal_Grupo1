@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser(roles = "REPRESENTATIVE")
+@WithMockUser(roles = "BUYER")
 public class BuyerControllerTest {
     @Autowired
     private WebApplicationContext context;
@@ -40,7 +40,7 @@ public class BuyerControllerTest {
     private ProductService productService;
 
     @Test
-    void testgetProductsByCategory() throws Exception {
+    void testGetProductsByCategory() throws Exception {
 
         when(productService.getProductsByCategory(any())).thenReturn(createProductList());
         this.mockMvc.perform(
@@ -53,7 +53,7 @@ public class BuyerControllerTest {
                         .andExpect(jsonPath("$[0].state").value("FF"));
     }
     @Test
-    void testgetProductsByCategoryException() throws Exception {
+    void testGetProductsByCategoryException() throws Exception {
 
         when(productService.getProductsByCategory(any())).thenThrow(new ProductsOutOfStockException("No products where found in the category: FS"));
         this.mockMvc.perform(
@@ -62,8 +62,25 @@ public class BuyerControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("No products where found in the category: FS"))
                 .andExpect(jsonPath("$.code").value(400));
-
     }
+
+
+
+
+    @Test
+    void testGetProducts() throws Exception {
+
+        when(productService.getProducts()).thenReturn(createProductList());
+        this.mockMvc.perform(
+                get("/api/v1/fresh-products/")
+                        .content("")).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].productId").value("1"))
+                .andExpect(jsonPath("$[0].name").value("MANZANAS"))
+                .andExpect(jsonPath("$[0].additionalInfo").value("infoAdd"))
+                .andExpect(jsonPath("$[0].state").value("FF"));
+    }
+
 
 
 

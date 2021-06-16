@@ -5,6 +5,8 @@ package com.example.demo_bootcamp_spring.controller;
 import com.example.demo_bootcamp_spring.dtos.BatchResponse;
 import com.example.demo_bootcamp_spring.dtos.BatchStock;
 import com.example.demo_bootcamp_spring.dtos.SectionDTO;
+import com.example.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
+import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.services.Batch.BatchService;
 import com.google.gson.Gson;
@@ -27,8 +29,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -183,6 +184,19 @@ public class IntegrationBatchController {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$[0].message").value("Due Date is required"));
+    }
+
+    @Test
+    void testGetExistingInboundOrderId() throws Exception {
+
+        when(batchService.saveBatch(any())).thenThrow(new ExistingInboundOrderId());
+        this.mockMvc.perform(
+                post("/api/v1/fresh-products/inboundorder")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The given InboundOrder Id already exist.Create a new one!"))
+                .andExpect(jsonPath("$.code").value(400));
     }
 
 

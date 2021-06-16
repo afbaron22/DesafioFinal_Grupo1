@@ -1,9 +1,6 @@
 package com.example.demo_bootcamp_spring.service;
 import com.example.demo_bootcamp_spring.dtos.*;
-import com.example.demo_bootcamp_spring.exceptions.NoRelatedWarehousesToProduct;
-import com.example.demo_bootcamp_spring.exceptions.NonExistentProductException;
-import com.example.demo_bootcamp_spring.exceptions.NotExistingBatch;
-import com.example.demo_bootcamp_spring.exceptions.NotFoundInboundOrderId;
+import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
@@ -62,6 +59,7 @@ class BatchServiceTest {
         assertEquals(expected,batchService.getProductFromBatches("productTest","Default"));
     }
 
+
     @Test
     public void shouldGetProductsFromBatchesOrderByCurrentQuantity(){
         BatchStockProductSearch expected = createBatchStockProductSearchOrderByCurrentQuantity();
@@ -77,7 +75,20 @@ class BatchServiceTest {
     }
 
     @Test
-    public void shoudGetProductFromWarehouse(){
+    void shouldGetInvalidSectionId() {
+        Optional<Section> optionalSection = Optional.empty();
+        List<Batch> batchList = createBatchList();
+        when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById(any())).thenReturn(optionalSection);
+
+        assertThrows(InvalidSectionId.class, () -> {
+            batchService.getProductFromBatches("productTest","Default");
+        });
+    }
+
+    @Test
+    public void shouldGetProductFromWarehouse(){
 
         List<Map<String,String>> expectedWarehouses = new ArrayList<>();
         Map<String,String> expectedWarehouse = new HashMap<>();
@@ -195,16 +206,6 @@ class BatchServiceTest {
     }
 
 
-    //TODO hacer saltar excepcion GetExistingInboundOrderId
-//    @Test
-//    void shouldGetExistingInboundOrderId() {
-//
-//        when(inboundOrderRepository.findById(inboundOrderTransaction.getInboundOrder().getOrderNumber()).isPresent()).thenReturn(true);
-//
-//        assertThrows(ExistingInboundOrderId.class, () -> {
-//            batchService.saveBatch(inboundOrderTransaction);
-//        });
-//    }
 
 
     @Test
@@ -260,6 +261,8 @@ class BatchServiceTest {
             batchService.putBatch(inboundOrderTransaction);
         });
     }
+
+
     //------------------------------------------TESTS METHOD GETPRODUCTSBYCATEGORY--------------------------------------------------
 
 

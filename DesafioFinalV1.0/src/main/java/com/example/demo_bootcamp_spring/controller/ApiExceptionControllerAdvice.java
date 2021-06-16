@@ -57,13 +57,6 @@ public class ApiExceptionControllerAdvice {
     }
 
 
-
-    @ExceptionHandler(ValidationErrorException.class)
-    public ResponseEntity<?> ValidationErrorException(ValidationErrorException validationErrorException){
-        ValidationError validationError = new ValidationError(validationErrorException.getField(), validationErrorException.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<ValidationError>(validationError, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException argumentNotValidException) {
         List<ValidationErrorDTO> valErrorList = new ArrayList<>();
