@@ -9,7 +9,8 @@
 {
     "username": "username1",
     "password": "admin",
-    "role": "ROLE_REPRESENTATIVE"
+    "role": "ROLE_REPRESENTATIVE",
+    "idWarehouse": 1
 }
 ```
 
@@ -20,7 +21,8 @@ Roles: {"ROLE_BUYER","ROLE_REPRESENTATIVE","ROLE_SELLER"}
 ```
 {
     "username": "username1",
-    "password": "admin"
+    "password": "admin",
+    "idWarehouse": 1
 }
 ```
 Response:
