@@ -14,8 +14,6 @@ import java.util.List;
 public class OrderDTO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
     LocalDate date;
-
     String buyerId;
-
     List<ProductDTO> products;
 }

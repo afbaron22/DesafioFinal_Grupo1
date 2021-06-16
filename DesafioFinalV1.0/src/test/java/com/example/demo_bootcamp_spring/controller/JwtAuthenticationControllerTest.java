@@ -4,6 +4,7 @@ import com.example.demo_bootcamp_spring.dtos.JwtRequest;
 import com.example.demo_bootcamp_spring.dtos.JwtResponse;
 import com.example.demo_bootcamp_spring.dtos.UserDto;
 import com.example.demo_bootcamp_spring.models.Account;
+import com.example.demo_bootcamp_spring.models.Warehouse;
 import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
 import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,18 +37,15 @@ class JwtAuthenticationControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private JwtUserDetailsService jwtUserDetailsService;
-    @MockBean
-    private JwtTokenUtil jwtTokenUtil;
 
 
     @Test
     public void shouldReturnNewToken() throws Exception {
         UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("BUYER"));
-        when(jwtUserDetailsService.loadUserByUsername("user")).thenReturn(userDetails);
-        when(jwtTokenUtil.generateToken(any(UserDetails.class))).thenReturn("token");
+        when(jwtUserDetailsService.authenticate(any(JwtRequest.class))).thenReturn(new JwtResponse("token"));
         this.mockMvc.perform(MockMvcRequestBuilders.post("/auth")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(new JwtRequest("user","password"))))
+                    .content(new ObjectMapper().writeValueAsString(new JwtRequest("user","password",1))))
                     .andDo(print())
                     .andExpect(status().is2xxSuccessful())
                     .andExpect(content().string(new ObjectMapper().writeValueAsString(new JwtResponse("token"))));
@@ -55,12 +53,12 @@ class JwtAuthenticationControllerTest {
 
     @Test
     public void shouldRegisterNewUser() throws Exception {
-        when(jwtUserDetailsService.save(new UserDto("user","password","REPRESENTATIVE"))).thenReturn(new Account(1,"user","password","REPRESENTATIVE"));
+        when(jwtUserDetailsService.save(new UserDto("user","password","REPRESENTATIVE",1))).thenReturn(new Account(1,"user","password","REPRESENTATIVE",new Warehouse(1,"","","")));
         this.mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(new UserDto("user","password","REPRESENTATIVE"))))
+                .content(new ObjectMapper().writeValueAsString(new UserDto("user","password","REPRESENTATIVE", 1))))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string(new ObjectMapper().writeValueAsString(new Account(1,"user","password","REPRESENTATIVE"))));;
+                .andExpect(content().string(new ObjectMapper().writeValueAsString(new Account(1,"user","password","REPRESENTATIVE",new Warehouse(1,"","","")))));
     }
 }

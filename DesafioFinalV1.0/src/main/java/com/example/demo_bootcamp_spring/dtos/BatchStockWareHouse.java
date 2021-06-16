@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private String username;
-    private String password;
-    private String role;
-    private Integer idWarehouse;
+@NoArgsConstructor
+public class BatchStockWareHouse {
+    private List<Map<String,Object>> batchStock;
+
 }

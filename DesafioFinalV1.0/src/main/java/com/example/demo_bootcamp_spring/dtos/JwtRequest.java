@@ -8,15 +8,17 @@ public class JwtRequest implements Serializable {
 	
 	private String username;
 	private String password;
+	private Integer idWarehouse;
 	
 	//default constructor for JSON Parsing
 	public JwtRequest()
 	{
 	}
 
-	public JwtRequest(String username, String password) {
+	public JwtRequest(String username, String password, Integer idWarehouse) {
 		this.setUsername(username);
 		this.setPassword(password);
+		this.setIdWarehouse(idWarehouse);
 	}
 
 	public String getUsername() {
@@ -33,5 +35,13 @@ public class JwtRequest implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Integer getIdWarehouse() {
+		return idWarehouse;
+	}
+
+	public void setIdWarehouse(Integer idWarehouse) {
+		this.idWarehouse = idWarehouse;
 	}
 }
