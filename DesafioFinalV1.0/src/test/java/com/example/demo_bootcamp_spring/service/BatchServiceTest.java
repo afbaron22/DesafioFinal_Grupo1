@@ -1,17 +1,17 @@
-package com.example.demo_bootcamp_spring.services.Batch;
+package com.example.demo_bootcamp_spring.service;
+
 import com.example.demo_bootcamp_spring.dtos.BatchStockProduct;
 import com.example.demo_bootcamp_spring.dtos.BatchStockProductSearch;
 import com.example.demo_bootcamp_spring.dtos.SectionDTO;
-import com.example.demo_bootcamp_spring.exceptions.InvalidSectionId;
+import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.dtos.*;
-import com.example.demo_bootcamp_spring.exceptions.NonExistentProductException;
-import com.example.demo_bootcamp_spring.exceptions.NotExistingBatch;
-import com.example.demo_bootcamp_spring.exceptions.NotFoundInboundOrderId;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import com.example.demo_bootcamp_spring.services.Batch.BatchService;
+import com.example.demo_bootcamp_spring.services.Product.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -35,10 +35,12 @@ class BatchServiceTest {
     @Mock
     SectionRepository sectionRepository;
     @Mock
-    private InboundOrderRepository inboundOrderRepository;
-
+    InboundOrderRepository inboundOrderRepository;
     @InjectMocks
     BatchService batchService;
+
+    @InjectMocks
+    ProductService productService;
 
     @Mock
     private
