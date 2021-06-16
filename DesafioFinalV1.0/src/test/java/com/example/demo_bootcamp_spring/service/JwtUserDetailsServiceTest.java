@@ -4,7 +4,9 @@ import com.example.demo_bootcamp_spring.dtos.UserDto;
 import com.example.demo_bootcamp_spring.models.Account;
 import com.example.demo_bootcamp_spring.models.Warehouse;
 import com.example.demo_bootcamp_spring.repository.UserRepository;
+import com.example.demo_bootcamp_spring.repository.WarehouseRepository;
 import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
+import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,6 +34,8 @@ class JwtUserDetailsServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder bcryptEncoder;
+    @Mock
+    private WarehouseRepository warehouseRepository;
     @InjectMocks
     private JwtUserDetailsService userDetailsService;
 
@@ -69,6 +75,7 @@ class JwtUserDetailsServiceTest {
         //WHEN
         when(bcryptEncoder.encode(anyString())).thenReturn("encryptedPassword");
         when(userRepository.save(any(Account.class))).thenReturn(user);
+        when(warehouseRepository.findById(any(Integer.class))).thenReturn(Optional.of(warehouse));
         //THEN
         assertEquals(user,userDetailsService.save(userDto));
     }
