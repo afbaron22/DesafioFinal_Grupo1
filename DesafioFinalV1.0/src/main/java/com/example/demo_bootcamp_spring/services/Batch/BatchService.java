@@ -8,6 +8,7 @@ import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
@@ -119,6 +120,31 @@ public class BatchService implements IBatchService {
             warehouses.put("totalQuantity",x[1].toString());
             return warehouses; }).collect(Collectors.toList());
         return new SearchedWarehouseProducts(idProducto,warehouseList);
+    }
+
+    /**
+     * Este método se encarga de revisar en un warehouse asociado los productos que van a vencer en un determiando
+     * rango de tiempo proporcionado por el usuario. El método consiste es delimitar dos fechas en las cuales
+     * puede vencer un producto y traer el bache asociado a este.
+     * @param idWarehouse
+     * @param days
+     * @return
+     */
+    //---------------------------------------MÉTODO GETBATCHESINWAREHOUSEBYDUEDATE--------------------------------------------------
+    public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, int days) {
+        var limitDate =  currentDate.plusDays(days);
+        var todayDate = currentDate.minusDays(1);
+        Map<String,Object> batchStock = new HashMap<>();
+        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        var listBatch = lista.stream().map(x->{
+           if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
+               batchStock.put("batchNumber",x.getBatchNumber());
+               batchStock.put("productId",x.getProduct().getProductId());
+               batchStock.put("dueDate",x.getDueDate());
+               batchStock.put("quantity",x.getCurrentQuantity());
+               return batchStock; }return null; }).collect(Collectors.toList());
+        while (listBatch.remove(null)) {}
+        return new BatchStockWareHouse(listBatch);
     }
 
     /**MÉTODO PROCESSLIST
