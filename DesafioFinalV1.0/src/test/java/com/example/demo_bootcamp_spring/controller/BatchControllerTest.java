@@ -53,9 +53,11 @@ class BatchControllerTest {
         final ObjectMapper mapper = makeMapper();
         BatchStockProductSearch expected = createBatchStockProductSearch();
         List<Batch> batchList = createBatchList();
-        when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
+        when(batchRepository.findByProductId("1")).thenReturn(Optional.of(batchList));
         when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/fresh-products/list").param("querytype", "productTest"))
+        when(batchService.getProductFromBatches("1",null)).thenReturn(createBatchStockProductSearch());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/fresh-products/list")
+                    .param("querytype", String.valueOf(1)))
                     .andDo(print())
                     .andExpect(status().is2xxSuccessful())
                     .andExpect(content().string(mapper.writeValueAsString(expected)));
@@ -91,7 +93,7 @@ class BatchControllerTest {
     }
 
     private Product createProduct(){
-        return new Product("productTest","productName","test", State.FS,4000.0);
+        return new Product("1","productName","test", State.FS,4000.0);
     }
 
     private InboundOrder createInboundOrder(){
@@ -137,7 +139,7 @@ class BatchControllerTest {
     private BatchStockProductSearch createBatchStockProductSearch(){
         SectionDTO sectionDto = createSectionDto();
         List<BatchStockProduct> listFound = createBatchStockProduct();
-        return new BatchStockProductSearch(sectionDto,"productTest",listFound);
+        return new BatchStockProductSearch(sectionDto,"1",listFound);
     }
 
 }
