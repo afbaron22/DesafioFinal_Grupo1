@@ -27,7 +27,6 @@ public class BuyerController {
     }
 
     //TODO validaciones
-    //TODO verificacion que el usuario logueado es un comprador (BUYER)
 
     @GetMapping("/")
     public ResponseEntity<?> getProducts(){

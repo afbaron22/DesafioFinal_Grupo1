@@ -13,28 +13,24 @@ import com.example.demo_bootcamp_spring.models.Product;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.OrdersRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
-import com.example.demo_bootcamp_spring.repository.WarehouseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class OrdersService implements IOrderService {
-    public OrdersRepository ordersRepository;
-    public ProductsRepository productsRepository;
-    public BatchRepository batchRepository;
+
+    private OrdersRepository ordersRepository;
+    private ProductsRepository productsRepository;
+    private BatchRepository batchRepository;
 
     public OrdersService(OrdersRepository ordersRepository, ProductsRepository productsRepository, BatchRepository batchRepository) {
         this.ordersRepository = ordersRepository;
         this.productsRepository = productsRepository;
         this.batchRepository = batchRepository;
     }
-//TODO implementar logica del servicio
 
     @Override
     //Dar de alta una orden con la lista de productos que componen la
@@ -49,8 +45,6 @@ public class OrdersService implements IOrderService {
     //Calcular precio final
     public Double registerOrder(OrderDTO orderDTO ) throws ProductsOutOfStockException {
 
-        //TODO chequear que exista cantidad suficiente de cada producto, en caso negativo devolver lista de errores.
-        //TODO ver de cambiar nombre de la clase por purchaseOrder
         List<OrderProduct> orderProductList = checkAndGetOrderProduct(orderDTO);
         Double finalPrice = 0.0;
 
@@ -67,7 +61,7 @@ public class OrdersService implements IOrderService {
             orderProduct.setOrders(newOrder);
         }
         newOrder = ordersRepository.save(newOrder);
-        //TODO necesitamos el ID.
+
         return finalPrice;
     }
 

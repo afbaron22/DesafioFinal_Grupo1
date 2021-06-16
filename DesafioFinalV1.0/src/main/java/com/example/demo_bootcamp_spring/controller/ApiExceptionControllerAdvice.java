@@ -17,8 +17,20 @@ import java.util.List;
 @ControllerAdvice
 public class ApiExceptionControllerAdvice {
     @ExceptionHandler({NonExistentProductException.class})
-    public ResponseEntity<?> handleResponseExceptions(RuntimeException runtimeException){
+    public ResponseEntity<?> handleResponseExceptions(RuntimeException runtimeException) {
         ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<?> ProductNotFoundException(ProductNotFoundException productNotFoundException){
+        ErrorMessage errorMessage = new ErrorMessage(productNotFoundException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<?> OrderNotFoundException(OrderNotFoundException orderNotFoundException){
+        ErrorMessage errorMessage = new ErrorMessage(orderNotFoundException.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
