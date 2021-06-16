@@ -11,6 +11,6 @@ public interface IBatchService {
     BatchStock putBatch(InboundOrderTransaction inboundOrder);
     BatchStockProductSearch getProductFromBatches(String idProducto,String ordBy);
     SearchedWarehouseProducts getProductFromWarehouses(String idProducto);
-    BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, int days);
-    Integer validate(String userName);
+     BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, Integer days,String category,String order);
+     Integer validate(String userName);
 }
