@@ -2,6 +2,7 @@ package com.example.demo_bootcamp_spring.service;
 
 import com.example.demo_bootcamp_spring.dtos.UserDto;
 import com.example.demo_bootcamp_spring.models.Account;
+import com.example.demo_bootcamp_spring.models.Warehouse;
 import com.example.demo_bootcamp_spring.repository.UserRepository;
 import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ class JwtUserDetailsServiceTest {
     private String username;
     private Account user;
     private UserDto userDto;
+    private Warehouse warehouse;
 
     @Mock
     private UserRepository userRepository;
@@ -33,8 +35,9 @@ class JwtUserDetailsServiceTest {
 
     @BeforeEach
     void setup(){
-        user = new Account(1,"username","password","role");
-        userDto = new UserDto("username","password","role");
+        warehouse = new Warehouse(1,"address", "location","province");
+        user = new Account(1,"username","password","role",warehouse);
+        userDto = new UserDto("username","password","role",1);
         username = "username";
     }
 

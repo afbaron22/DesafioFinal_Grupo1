@@ -3,6 +3,7 @@ package com.example.demo_bootcamp_spring.services;
 import com.example.demo_bootcamp_spring.dtos.UserDto;
 import com.example.demo_bootcamp_spring.models.Account;
 import com.example.demo_bootcamp_spring.repository.UserRepository;
+import com.example.demo_bootcamp_spring.repository.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,9 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
+    @Autowired
+    private WarehouseRepository warehouseRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account user = userDao.findByUsername(username);
@@ -34,6 +38,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
         newUser.setRole(user.getRole());
+        newUser.setWarehouse(warehouseRepository.findById(user.getIdWarehouse()).get());
         return userDao.save(newUser);
     }
 }

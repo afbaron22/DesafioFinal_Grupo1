@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,8 @@ public class Account {
     @Column
     private String role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="warehouse_id", referencedColumnName = "idWarehouse")
+    @OneToOne()
+    @JoinColumn(name="idWarehouse")
     private Warehouse warehouse;
 
 
