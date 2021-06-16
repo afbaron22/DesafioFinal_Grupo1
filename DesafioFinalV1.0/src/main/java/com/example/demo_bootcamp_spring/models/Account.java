@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +23,10 @@ public class Account {
     private String password;
     @Column
     private String role;
+
+    @OneToOne()
+    @JoinColumn(name="idWarehouse")
+    private Warehouse warehouse;
+
 
 }
