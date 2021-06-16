@@ -1,5 +1,6 @@
 package com.example.demo_bootcamp_spring.services.Product;
 
+import com.example.demo_bootcamp_spring.exceptions.ProductNotFoundException;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.Product;
 import com.example.demo_bootcamp_spring.models.State;
@@ -23,7 +24,7 @@ public class ProductService implements IProductService {
     @Override
     public List<Product> getProducts() {
         if (productsRepo.count() <= 0){
-            throw new ProductsOutOfStockException("No products where found");
+            throw new ProductNotFoundException("No products where found");
         }
         return productsRepo.findAll();
     }

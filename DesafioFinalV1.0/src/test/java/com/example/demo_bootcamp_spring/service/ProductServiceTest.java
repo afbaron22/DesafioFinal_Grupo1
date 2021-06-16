@@ -1,5 +1,6 @@
 package com.example.demo_bootcamp_spring.service;
 
+import com.example.demo_bootcamp_spring.exceptions.ProductNotFoundException;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.Product;
 import com.example.demo_bootcamp_spring.models.State;
@@ -63,10 +64,10 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void shouldThrowProductsOutOfStockExceptionWhenGetAllProducts(){
+    public void shouldThrowProductNotFoundExceptionWhenGetAllProducts(){
         when(productsRepository.count()).thenReturn((long)0);
         when(productsRepository.findAll()).thenReturn(productRepoMOCK);
-        assertThrows(ProductsOutOfStockException.class,() -> productService.getProducts());
+        assertThrows(ProductNotFoundException.class,() -> productService.getProducts());
     }
 
     @Test
