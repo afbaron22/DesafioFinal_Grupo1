@@ -41,7 +41,6 @@ class JwtAuthenticationControllerTest {
 
     @Test
     public void shouldReturnNewToken() throws Exception {
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("BUYER"));
         when(jwtUserDetailsService.authenticate(any(JwtRequest.class))).thenReturn(new JwtResponse("token"));
         this.mockMvc.perform(MockMvcRequestBuilders.post("/auth")
                     .contentType(MediaType.APPLICATION_JSON)

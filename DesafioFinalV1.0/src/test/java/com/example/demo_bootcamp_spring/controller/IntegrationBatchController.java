@@ -1,23 +1,25 @@
 package com.example.demo_bootcamp_spring.controller;
 
-import com.example.demo_bootcamp_spring.dtos.BatchResponse;
-import com.example.demo_bootcamp_spring.dtos.BatchStock;
-import com.example.demo_bootcamp_spring.dtos.SectionDTO;
+import com.example.demo_bootcamp_spring.dtos.*;
 import com.example.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.services.Batch.BatchService;
+import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
 import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import com.google.gson.Gson;
+import io.jsonwebtoken.Header;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,10 +27,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,9 +48,14 @@ public class IntegrationBatchController {
     private WebApplicationContext context;
     @Autowired
     private MockMvc mockMvc;
+    @InjectMocks
+    private JwtUserDetailsService userDetailsService;
 
     @MockBean
     private BatchService batchService;
+    @InjectMocks
+    private JwtTokenUtil jwtTokenUtil;
+
 
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
@@ -62,12 +71,14 @@ public class IntegrationBatchController {
     @Test
     void testInsertBatch_whenReceiveAInboundOrderTransactionOK_thenReturnOkWithBatchStock() throws Exception {
         BatchStock batchStockResponse = createBatchStock();
+
         UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("REPRESENTATIVE"));
         when(batchService.saveBatch(any())).thenReturn(batchStockResponse);
         when(batchService.validate(any())).thenReturn(1);
 
         this.mockMvc.perform(
                 post("/api/v1/fresh-products/inboundorder")
+                        .header("Authorization","Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization","Bearer token " + jwtTokenUtil.generateToken(userDetails))
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
@@ -406,38 +417,5 @@ public class IntegrationBatchController {
 
 
 
-
-
-
-
-
-
-/*
-    @Test
-    void detalle() throws Exception {
-        when(cuentaService.findById(1L)).thenReturn(Datos.crearCuenta001());
-        this.mvc.perform(get("/api/cuentas/1")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.persona").value("Andres"))
-                .andReturn();
-        verify(cuentaService,atLeast(1)).findById(1L);
-    }
-
-    @Test
-    void testTransferir() throws Exception {
-        TransaccionDto dto = new TransaccionDto();
-        dto.setCuentaDestinoId(2L);
-        dto.setCuentaOrigenId(1l);
-        dto.setMonto(new BigDecimal("100"));
-        dto.setBancoId(1L);
-        this.mvc.perform(post("/api/cuentas/transferir")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(dto)))
-                .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$.status").value("ok"))
-                .andExpect(jsonPath("$.mensaje").value("Transferencia realizada con exito"));
-
-    }
-*/
 
 }

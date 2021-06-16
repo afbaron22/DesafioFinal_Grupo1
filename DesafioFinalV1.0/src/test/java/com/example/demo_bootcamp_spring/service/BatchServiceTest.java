@@ -46,6 +46,7 @@ class BatchServiceTest {
     private
     ProductsRepository productsRepository;
 
+
     private InboundOrderTransaction inboundOrderTransaction;
 
     @BeforeEach
