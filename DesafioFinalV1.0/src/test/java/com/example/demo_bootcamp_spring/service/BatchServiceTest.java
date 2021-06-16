@@ -1,13 +1,17 @@
-package com.example.demo_bootcamp_spring.service;
+package com.example.demo_bootcamp_spring.services.Batch;
+import com.example.demo_bootcamp_spring.dtos.BatchStockProduct;
+import com.example.demo_bootcamp_spring.dtos.BatchStockProductSearch;
+import com.example.demo_bootcamp_spring.dtos.SectionDTO;
+import com.example.demo_bootcamp_spring.exceptions.InvalidSectionId;
 import com.example.demo_bootcamp_spring.dtos.*;
-import com.example.demo_bootcamp_spring.exceptions.*;
+import com.example.demo_bootcamp_spring.exceptions.NonExistentProductException;
+import com.example.demo_bootcamp_spring.exceptions.NotExistingBatch;
+import com.example.demo_bootcamp_spring.exceptions.NotFoundInboundOrderId;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
-import com.example.demo_bootcamp_spring.services.Batch.BatchService;
-import com.example.demo_bootcamp_spring.services.Product.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -35,8 +39,6 @@ class BatchServiceTest {
 
     @InjectMocks
     BatchService batchService;
-    @InjectMocks
-    ProductService productService;
 
     @Mock
     private
@@ -50,6 +52,7 @@ class BatchServiceTest {
     }
 
 
+
     @Test
     public void shouldGetProductsFromBatches(){
         BatchStockProductSearch expected = createBatchStockProductSearch();
@@ -58,7 +61,6 @@ class BatchServiceTest {
         when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
         assertEquals(expected,batchService.getProductFromBatches("productTest","Default"));
     }
-
 
     @Test
     public void shouldGetProductsFromBatchesOrderByCurrentQuantity(){
@@ -70,8 +72,31 @@ class BatchServiceTest {
     }
 
     @Test
-    public void shouldGetProductsFromBatchesOrderByExpirationDate(){
+    public void shouldGetProductsFromBatchesOrderByDueDate(){
+        BatchStockProductSearch expected = createBatchStockProductSearchOrderByDueDate();
+        List<Batch> batchList = createBatchList();
+        when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        assertEquals(expected,batchService.getProductFromBatches("productTest","F"));
+    }
 
+    @Test
+    public void shouldGetProductsFromBatchesOrderByBatchNumber(){
+        BatchStockProductSearch expected = createBatchStockProductSearchOrderByBatchNumber();
+        List<Batch> batchList = createBatchList();
+        when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        assertEquals(expected,batchService.getProductFromBatches("productTest","L"));
+    }
+
+    @Test
+    public void shouldThrownInvalidSectionId(){
+        List<Batch> batchList = createBatchList();
+        when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
+        when(sectionRepository.findById("badSectionTest")).thenThrow(InvalidSectionId.class);
+        assertThrows(InvalidSectionId.class, () -> {
+            batchService.getProductFromBatches("productTest","L");
+        });
     }
 
     @Test
@@ -124,56 +149,67 @@ class BatchServiceTest {
         Product product = createProduct();
         LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2021,5,14),LocalTime.of(1,1,1));
         LocalDate expirationDate = LocalDate.of(2021,7,14);
-        LocalDate expirationDate1 = LocalDate.of(2021,7,14);
-        LocalDate expirationDate2 = LocalDate.of(2021,7,14);
+        LocalDate expirationDate1 = LocalDate.of(2021,7,13);
+        LocalDate expirationDate2 = LocalDate.of(2021,7,12);
         LocalDate date = LocalDate.of(2021,5,14);
         LocalDate date1 = LocalDate.of(2021,5,14);
         LocalDate date2 = LocalDate.of(2021,5,14);
         List<Batch> batchList = new ArrayList<>();
-        batchList.add(new Batch("test",product,(float)20,(float)20,expirationDate,date,dateTime,500,500,createInboundOrder()));
-        batchList.add(new Batch("test1",product,(float)20,(float)20,expirationDate1,date1,dateTime,500,300,createInboundOrder()));
-        batchList.add(new Batch("test2",product,(float)20,(float)20,expirationDate2,date2,dateTime,500,400,createInboundOrder()));
+        batchList.add(new Batch("0",product,(float)20,(float)20,expirationDate,date,dateTime,500,500,createInboundOrder()));
+        batchList.add(new Batch("1",product,(float)20,(float)20,expirationDate2,date1,dateTime,500,300,createInboundOrder()));
+        batchList.add(new Batch("2",product,(float)20,(float)20,expirationDate1,date2,dateTime,500,400,createInboundOrder()));
         return batchList;
-    }
-
-    private List<BatchStockProduct> createBatchStockProductWithNullValues(){
-        List<BatchStockProduct> listFound = new ArrayList<>();
-        LocalDate date = LocalDate.of(2021,7,14);
-        LocalDate date1 = LocalDate.of(2021,7,14);
-        LocalDate date2 = LocalDate.of(2021,7,14);
-        listFound.add(new BatchStockProduct("test",500,date));
-        listFound.add(new BatchStockProduct("test1",500,date1));
-        listFound.add(null);
-        listFound.add(new BatchStockProduct("test2",500,date2));
-        listFound.add(null);
-        return listFound;
     }
 
     private List<BatchStockProduct> createBatchStockProductOrderByCurrentQuantity(){
         List<BatchStockProduct> listFound = new ArrayList<>();
         LocalDate date = LocalDate.of(2021,7,14);
-        LocalDate date1 = LocalDate.of(2021,7,14);
-        LocalDate date2 = LocalDate.of(2021,7,14);
-        listFound.add(new BatchStockProduct("test1",300,date));
-        listFound.add(new BatchStockProduct("test2",400,date1));
-        listFound.add(new BatchStockProduct("test",500,date2));
+        LocalDate date1 = LocalDate.of(2021,7,13);
+        LocalDate date2 = LocalDate.of(2021,7,12);
+        listFound.add(new BatchStockProduct("1",300,date2));
+        listFound.add(new BatchStockProduct("2",400,date1));
+        listFound.add(new BatchStockProduct("0",500,date));
+        return listFound;
+    }
+
+    private List<BatchStockProduct> createBatchStockProductOrderByBatchNumber(){
+        List<BatchStockProduct> listFound = new ArrayList<>();
+        LocalDate date = LocalDate.of(2021,7,14);
+        LocalDate date1 = LocalDate.of(2021,7,13);
+        LocalDate date2 = LocalDate.of(2021,7,12);
+        listFound.add(new BatchStockProduct("0",500,date));
+        listFound.add(new BatchStockProduct("1",300,date2));
+        listFound.add(new BatchStockProduct("2",400,date1));
+        return listFound;
+    }
+
+    private List<BatchStockProduct> createBatchStockProductOrderByDueDate(){
+        List<BatchStockProduct> listFound = new ArrayList<>();
+        LocalDate date = LocalDate.of(2021,7,14);
+        LocalDate date1 = LocalDate.of(2021,7,13);
+        LocalDate date2 = LocalDate.of(2021,7,12);
+        listFound.add(new BatchStockProduct("1",300,date2));
+        listFound.add(new BatchStockProduct("2",400,date1));
+        listFound.add(new BatchStockProduct("0",500,date));
         return listFound;
     }
 
     private List<BatchStockProduct> createBatchStockProduct(){
         List<BatchStockProduct> listFound = new ArrayList<>();
         LocalDate date = LocalDate.of(2021,7,14);
-        LocalDate date1 = LocalDate.of(2021,7,14);
-        LocalDate date2 = LocalDate.of(2021,7,14);
-        listFound.add(new BatchStockProduct("test",500,date));
-        listFound.add(new BatchStockProduct("test1",300,date1));
-        listFound.add(new BatchStockProduct("test2",400,date2));
+        LocalDate date1 = LocalDate.of(2021,7,13);
+        LocalDate date2 = LocalDate.of(2021,7,12);
+        listFound.add(new BatchStockProduct("0",500,date));
+        listFound.add(new BatchStockProduct("1",300,date2));
+        listFound.add(new BatchStockProduct("2",400,date1));
         return listFound;
     }
 
     private SectionDTO createSectionDto(){
         return new SectionDTO(State.FS,"testWHC");
     }
+
+
 
     private BatchStockProductSearch createBatchStockProductSearch(){
         SectionDTO sectionDto = createSectionDto();
@@ -187,6 +223,11 @@ class BatchServiceTest {
         return new BatchStockProductSearch(sectionDto,"productTest",listFound);
     }
 
+    private BatchStockProductSearch createBatchStockProductSearchOrderByDueDate(){
+        SectionDTO sectionDto = createSectionDto();
+        List<BatchStockProduct> listFound = createBatchStockProductOrderByDueDate();
+        return new BatchStockProductSearch(sectionDto,"productTest",listFound);
+    }
     //------------------------------------------TESTS METHOD SAVEBATCH--------------------------------------------------
 
     @Test
@@ -392,4 +433,10 @@ class BatchServiceTest {
         return List.of(product,product2);
     }
 
+
+    private BatchStockProductSearch createBatchStockProductSearchOrderByBatchNumber(){
+        SectionDTO sectionDto = createSectionDto();
+        List<BatchStockProduct> listFound = createBatchStockProductOrderByBatchNumber();
+        return new BatchStockProductSearch(sectionDto,"productTest",listFound);
+    }
 }

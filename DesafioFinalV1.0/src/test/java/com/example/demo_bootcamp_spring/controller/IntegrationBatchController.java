@@ -1,7 +1,5 @@
 package com.example.demo_bootcamp_spring.controller;
 
-
-
 import com.example.demo_bootcamp_spring.dtos.BatchResponse;
 import com.example.demo_bootcamp_spring.dtos.BatchStock;
 import com.example.demo_bootcamp_spring.dtos.SectionDTO;
