@@ -56,6 +56,14 @@ public class ApiExceptionControllerAdvice {
         return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({InvalidWarehouseException.class})
+    public ResponseEntity<?> handleInvalidWarehouseException(RuntimeException runtimeException){
+        ErrorMessage errorMessage = new ErrorMessage(runtimeException.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorMessage>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException argumentNotValidException) {

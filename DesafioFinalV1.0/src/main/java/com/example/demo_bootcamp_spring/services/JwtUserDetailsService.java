@@ -52,8 +52,8 @@ public class JwtUserDetailsService implements UserDetailsService {
     public JwtResponse authenticate(JwtRequest authenticationRequest){
         Account user = userDao.findByUsername(authenticationRequest.getUsername());
         UserDetails userDetails = loadUserByUsername(authenticationRequest.getUsername());
-        if(user.getWarehouse().getIdWarehouse() != authenticationRequest.getWarehouseId()){
-            throw new InvalidWarehouseException("User does not exist on warehouse: " + authenticationRequest.getWarehouseId());
+        if(user.getWarehouse().getIdWarehouse() != authenticationRequest.getIdWarehouse()){
+            throw new InvalidWarehouseException("User does not exist on warehouse: " + authenticationRequest.getIdWarehouse());
         }
         return new JwtResponse(jwtTokenUtil.generateToken(userDetails));
     }
