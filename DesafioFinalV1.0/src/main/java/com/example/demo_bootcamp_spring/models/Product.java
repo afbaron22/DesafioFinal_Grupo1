@@ -19,5 +19,7 @@ public class Product {
     private String name;
     private String additionalInfo;
     private State state;
+    private Double price;
+
 
 }
