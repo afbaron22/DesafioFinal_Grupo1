@@ -7,6 +7,7 @@ import com.example.demo_bootcamp_spring.exceptions.ExistingInboundOrderId;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.services.Batch.BatchService;
+import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,6 +48,9 @@ public class IntegrationBatchController {
     @MockBean
     private BatchService batchService;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
     private InboundOrderTransactionRequest inboundOrderTransactionRequest;
 
     @BeforeEach
@@ -56,11 +62,14 @@ public class IntegrationBatchController {
     @Test
     void testInsertBatch_whenReceiveAInboundOrderTransactionOK_thenReturnOkWithBatchStock() throws Exception {
         BatchStock batchStockResponse = createBatchStock();
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("REPRESENTATIVE"));
         when(batchService.saveBatch(any())).thenReturn(batchStockResponse);
+        when(batchService.validate(any())).thenReturn(1);
 
         this.mockMvc.perform(
                 post("/api/v1/fresh-products/inboundorder")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization","Bearer token " + jwtTokenUtil.generateToken(userDetails))
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.batchStock.[0].batchNumber").value("1"))
@@ -187,10 +196,13 @@ public class IntegrationBatchController {
     @Test
     void testGetExistingInboundOrderId() throws Exception {
 
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("REPRESENTATIVE"));
         when(batchService.saveBatch(any())).thenThrow(new ExistingInboundOrderId());
+        when(batchService.validate(any())).thenReturn(1);
         this.mockMvc.perform(
                 post("/api/v1/fresh-products/inboundorder")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization","Bearer token " + jwtTokenUtil.generateToken(userDetails))
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("The given InboundOrder Id already exist.Create a new one!"))
@@ -203,11 +215,14 @@ public class IntegrationBatchController {
     @Test
     void testPutBatch_whenReceiveAInboundOrderTransactionOK_thenReturnOkWithBatchStock() throws Exception {
         BatchStock batchStockResponse = createBatchStock();
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User("user","password", AuthorityUtils.createAuthorityList("REPRESENTATIVE"));
         when(batchService.putBatch(any())).thenReturn(batchStockResponse);
+        when(batchService.validate(any())).thenReturn(1);
 
         this.mockMvc.perform(
                 put("/api/v1/fresh-products/inboundorder")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization","Bearer token " + jwtTokenUtil.generateToken(userDetails))
                         .content(new Gson().toJson(inboundOrderTransactionRequest))).andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.batchStock.[0].batchNumber").value("1"))
