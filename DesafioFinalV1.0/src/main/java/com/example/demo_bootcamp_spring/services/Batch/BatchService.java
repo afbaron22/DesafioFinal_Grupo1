@@ -5,7 +5,6 @@ import com.example.demo_bootcamp_spring.models.Batch;
 import com.example.demo_bootcamp_spring.models.InboundOrder;
 import com.example.demo_bootcamp_spring.models.Section;
 import com.example.demo_bootcamp_spring.repository.*;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
@@ -139,8 +138,8 @@ public class BatchService implements IBatchService {
     public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, Integer days,String category,String order) {
         var limitDate =  currentDate.plusDays(days);
         var todayDate = currentDate.minusDays(1);
-        var lista = processListOrderBy(processListCategorie(idWarehouse,category),order);
-        var listBatch = lista.stream().map(x->{
+        var list = processListOrderBy(processListCategories(idWarehouse,category),order);
+        var listBatch = list.stream().map(x->{
            if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
                Map<String,Object> batchStock = new HashMap<>();
                batchStock.put("batchNumber",x.getBatchNumber());
@@ -153,29 +152,27 @@ public class BatchService implements IBatchService {
         return new BatchStockWareHouse(listBatch);
     }
     private  List<Batch> processListOrderBy(List<Batch> list,String order){
-        if(order.equals("asc"))
-            list.sort(Comparator.comparing(Batch::getDueDate));
-        else
+        if(order.equals("desc"))
             list.sort(Comparator.comparing(Batch::getDueDate).reversed());
         return list;
     }
 
-    private List<Batch> processListCategorie(Integer idWarehouse,String category){
-        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
-        lista.sort(Comparator.comparing(Batch::getDueDate));
+    private List<Batch> processListCategories(Integer idWarehouse, String category){
+        var list= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        list.sort(Comparator.comparing(Batch::getDueDate));
         if(category.equals("FF")) {
-            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
-            return lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==2).collect(Collectors.toList());
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            return list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==2).collect(Collectors.toList());
         }
         else if(category.equals("RF")){
-            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
-            lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==1).collect(Collectors.toList());
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==1).collect(Collectors.toList());
         }
         else if(category.equals("FS")){
-            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
-            lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==0).collect(Collectors.toList());
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==0).collect(Collectors.toList());
         }
-        return  lista;
+        return  list;
     }
 
     /**MÉTODO PROCESSLIST
