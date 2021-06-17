@@ -1,6 +1,7 @@
 package com.example.demo_bootcamp_spring.service;
 
 import com.example.demo_bootcamp_spring.exceptions.ProductNotFoundException;
+import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.Product;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
