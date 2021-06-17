@@ -1,6 +1,8 @@
 package com.example.demo_bootcamp_spring.controller;
 
 import com.example.demo_bootcamp_spring.dtos.OrderDTO;
+import com.example.demo_bootcamp_spring.dtos.PurchaseOrderDTO;
+import com.example.demo_bootcamp_spring.models.OrderProduct;
 import com.example.demo_bootcamp_spring.models.State;
 import com.example.demo_bootcamp_spring.services.IOrderService;
 import com.example.demo_bootcamp_spring.services.Product.IProductService;
@@ -9,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/api/v1/fresh-products")
@@ -23,9 +27,8 @@ public class BuyerController {
     }
 
     //TODO validaciones
-    //TODO verificacion que el usuario logueado es un comprador (BUYER)
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<?> getProducts(){
         return new ResponseEntity(productService.getProducts(), HttpStatus.OK);
     }
@@ -36,8 +39,8 @@ public class BuyerController {
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<?> registerOrder(@Valid @RequestBody OrderDTO orderDTO){
-        return new ResponseEntity(orderService.registerOrder(orderDTO), HttpStatus.OK);
+    public ResponseEntity<?> registerOrder(@Valid @RequestBody PurchaseOrderDTO purchaseOrder){
+        return new ResponseEntity(orderService.registerOrder(purchaseOrder.getPurchaseOrder()), HttpStatus.OK);
     }
 
     @GetMapping("/orders")
@@ -46,8 +49,8 @@ public class BuyerController {
     }
 
     @PutMapping("/orders")
-    public ResponseEntity<?> updateOrder(@Valid @RequestParam Integer idOrder, @RequestBody OrderDTO orderDTO){
-        orderService.updateOrder(idOrder, orderDTO);
+    public ResponseEntity<?> updateOrder(@Valid @RequestParam Integer idOrder, @RequestBody PurchaseOrderDTO purchaseOrder){
+        orderService.updateOrder(idOrder, purchaseOrder.getPurchaseOrder());
         return new ResponseEntity(HttpStatus.OK);
     }
 }

@@ -136,20 +136,46 @@ public class BatchService implements IBatchService {
      * @return
      */
     //---------------------------------------MÉTODO GETBATCHESINWAREHOUSEBYDUEDATE--------------------------------------------------
-    public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, int days) {
+    public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, Integer days,String category,String order) {
         var limitDate =  currentDate.plusDays(days);
         var todayDate = currentDate.minusDays(1);
-        Map<String,Object> batchStock = new HashMap<>();
-        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        var lista = processListOrderBy(processListCategorie(idWarehouse,category),order);
         var listBatch = lista.stream().map(x->{
            if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
+               Map<String,Object> batchStock = new HashMap<>();
                batchStock.put("batchNumber",x.getBatchNumber());
                batchStock.put("productId",x.getProduct().getProductId());
                batchStock.put("dueDate",x.getDueDate());
                batchStock.put("quantity",x.getCurrentQuantity());
-               return batchStock; }return null; }).collect(Collectors.toList());
+               return batchStock; }
+           return null; }).collect(Collectors.toList());
         while (listBatch.remove(null)) {}
         return new BatchStockWareHouse(listBatch);
+    }
+    private  List<Batch> processListOrderBy(List<Batch> list,String order){
+        if(order.equals("asc"))
+            list.sort(Comparator.comparing(Batch::getDueDate));
+        else
+            list.sort(Comparator.comparing(Batch::getDueDate).reversed());
+        return list;
+    }
+
+    private List<Batch> processListCategorie(Integer idWarehouse,String category){
+        var lista= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        lista.sort(Comparator.comparing(Batch::getDueDate));
+        if(category.equals("FF")) {
+            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
+            return lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==2).collect(Collectors.toList());
+        }
+        else if(category.equals("RF")){
+            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
+            lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==1).collect(Collectors.toList());
+        }
+        else if(category.equals("FS")){
+            Collections.sort(lista, Comparator.comparing(Batch::getDueDate));
+            lista.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==0).collect(Collectors.toList());
+        }
+        return  lista;
     }
 
     /**MÉTODO PROCESSLIST

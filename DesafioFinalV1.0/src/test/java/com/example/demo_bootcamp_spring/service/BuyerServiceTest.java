@@ -2,6 +2,7 @@ package com.example.demo_bootcamp_spring.service;
 
 import com.example.demo_bootcamp_spring.dtos.InboundOrderTransaction;
 import com.example.demo_bootcamp_spring.exceptions.NoRelatedWarehousesToProduct;
+import com.example.demo_bootcamp_spring.exceptions.ProductNotFoundException;
 import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.Product;
 import com.example.demo_bootcamp_spring.models.State;
@@ -67,7 +68,6 @@ public class BuyerServiceTest {
     }
 
 
-    //------------------------------------------TESTS METHOD GETPRODUCTS--------------------------------------------------
 
     @Test
     void testGetProducts() {
@@ -84,10 +84,10 @@ public class BuyerServiceTest {
     }
 
     @Test
-    void testProductsOutOfStockException() {
+    void testProductNotFoundException() {
         when(productsRepository.count()).thenReturn(0L);
 
-        assertThrows(ProductsOutOfStockException.class, () -> {
+        assertThrows(ProductNotFoundException.class, () -> {
             productService.getProducts();
         });
     }

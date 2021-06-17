@@ -22,11 +22,11 @@ public class WarehouseController {
     }
 
     @GetMapping(path = "/due-date")
-    public ResponseEntity<?> getBatchesInWarehouseByDueDate(@RequestParam int days,@RequestHeader("Authorization") String token){
+    public ResponseEntity<?> getBatchesInWarehouseByDueDate(@RequestParam int days,@RequestHeader("Authorization") String token,@RequestParam(required = false) String category,@RequestParam(required = false) String order){
         String jwtToken = token.substring(7);
         var idWarehouse = batchService.validate(jwtTokenUtil.getUsernameFromToken(jwtToken));
-        return new ResponseEntity(batchService.getBatchesInWarehouseByDueDate(idWarehouse,days), HttpStatus.CREATED);
+        if(category==null) category="default";
+        if(order==null)    order="default";
+        return new ResponseEntity(batchService.getBatchesInWarehouseByDueDate(idWarehouse,days,category,order), HttpStatus.CREATED);
     }
-
-
 }
