@@ -1,4 +1,4 @@
-package com.example.demo_bootcamp_spring.service;
+package com.example.demo_bootcamp_spring.services.Batch;
 
 import com.example.demo_bootcamp_spring.dtos.BatchStockProduct;
 import com.example.demo_bootcamp_spring.dtos.BatchStockProductSearch;
@@ -10,7 +10,6 @@ import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
 import com.example.demo_bootcamp_spring.repository.ProductsRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
-import com.example.demo_bootcamp_spring.services.Batch.BatchService;
 import com.example.demo_bootcamp_spring.services.Product.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,13 +37,10 @@ class BatchServiceTest {
     InboundOrderRepository inboundOrderRepository;
     @InjectMocks
     BatchService batchService;
-
     @InjectMocks
     ProductService productService;
-
     @Mock
-    private
-    ProductsRepository productsRepository;
+    private ProductsRepository productsRepository;
 
 
     private InboundOrderTransaction inboundOrderTransaction;
@@ -59,42 +55,42 @@ class BatchServiceTest {
     @Test
     public void shouldGetProductsFromBatches(){
         BatchStockProductSearch expected = createBatchStockProductSearch();
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
-        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSectionFS()));
         assertEquals(expected,batchService.getProductFromBatches("productTest","Default"));
     }
 
     @Test
     public void shouldGetProductsFromBatchesOrderByCurrentQuantity(){
         BatchStockProductSearch expected = createBatchStockProductSearchOrderByCurrentQuantity();
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
-        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSectionFS()));
         assertEquals(expected,batchService.getProductFromBatches("productTest","C"));
     }
 
     @Test
     public void shouldGetProductsFromBatchesOrderByDueDate(){
         BatchStockProductSearch expected = createBatchStockProductSearchOrderByDueDate();
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
-        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSectionFS()));
         assertEquals(expected,batchService.getProductFromBatches("productTest","F"));
     }
 
     @Test
     public void shouldGetProductsFromBatchesOrderByBatchNumber(){
         BatchStockProductSearch expected = createBatchStockProductSearchOrderByBatchNumber();
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
-        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSectionFS()));
         assertEquals(expected,batchService.getProductFromBatches("productTest","L"));
     }
 
     @Test
     public void shouldThrownInvalidSectionId(){
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
         when(sectionRepository.findById("badSectionTest")).thenThrow(InvalidSectionId.class);
         assertThrows(InvalidSectionId.class, () -> {
@@ -105,9 +101,9 @@ class BatchServiceTest {
     @Test
     void shouldGetInvalidSectionId() {
         Optional<Section> optionalSection = Optional.empty();
-        List<Batch> batchList = createBatchList();
+        List<Batch> batchList = createBatchListFS();
         when(batchRepository.findByProductId("productTest")).thenReturn(Optional.of(batchList));
-        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSection()));
+        when(sectionRepository.findById("sectionTest")).thenReturn(Optional.of(createSectionFS()));
         when(sectionRepository.findById(any())).thenReturn(optionalSection);
 
         assertThrows(InvalidSectionId.class, () -> {
@@ -134,22 +130,83 @@ class BatchServiceTest {
         assertEquals(expectedWarehouseProducts,batchService.getProductFromWarehouses("1"));
     }
 
-
-    private Product createProduct(){
-        return new Product("productTest","productName","test",State.FS, 4000.0);
+    @Test
+    public void shouldGetBatchesInWarehouseByDueDateFS(){
+        BatchStockWareHouse listBatchExpected = createBatchStockWareHouse();
+        List<Batch> listBatch = createBatchListFS();
+        when(batchRepository.findProductDueDate("60")).thenReturn(Optional.of(listBatch));
+        assertEquals(listBatchExpected,batchService.getBatchesInWarehouseByDueDate(60,27,"FS","asc"));
     }
 
-    private InboundOrder createInboundOrder(){
+    @Test
+    public void shouldGetBatchesInWarehouseByDueDateFF(){
+        BatchStockWareHouse listBatchExpected = createBatchStockWareHouse();
+        List<Batch> listBatch = createBatchListFF();
+        when(batchRepository.findProductDueDate("60")).thenReturn(Optional.of(listBatch));
+        assertEquals(listBatchExpected,batchService.getBatchesInWarehouseByDueDate(60,27,"FF","asc"));
+    }
+
+    @Test
+    public void shouldGetBatchesInWarehouseByDueDateRF(){
+        BatchStockWareHouse listBatchExpected = createBatchStockWareHouse();
+        List<Batch> listBatch = createBatchListRF();
+        when(batchRepository.findProductDueDate("60")).thenReturn(Optional.of(listBatch));
+        assertEquals(listBatchExpected,batchService.getBatchesInWarehouseByDueDate(60,27,"RF","asc"));
+    }
+
+    private BatchStockWareHouse createBatchStockWareHouse(){
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> mapBatch = new HashMap<>();
+        mapBatch.put("batchNumber","1");
+        mapBatch.put("productId","1");
+        mapBatch.put("dueDate",LocalDate.of(2021,7,12));
+        mapBatch.put("quantity",300);
+        Map<String, Object> mapBatch2 = new HashMap<>();
+        mapBatch2.put("batchNumber","2");
+        mapBatch2.put("productId","1");
+        mapBatch2.put("dueDate",LocalDate.of(2021,7,13));
+        mapBatch2.put("quantity",400);
+        list.add(mapBatch);
+        list.add(mapBatch2);
+        return new BatchStockWareHouse(list);
+    }
+
+    private Product createProductFS(){
+        return new Product("1","productName","test",State.FS, 4000.0);
+    }
+    private Product createProductFF(){
+        return new Product("1","productName","test",State.FF, 4000.0);
+    }
+    private Product createProductRF(){
+        return new Product("1","productName","test",State.RF, 4000.0);
+    }
+
+
+    private InboundOrder createInboundOrderFS(){
         LocalDate date = LocalDate.of(2021,5,14);
-        return new InboundOrder("numberTest",date,createSection());
+        return new InboundOrder("numberTest",date, createSectionFS());
+    }
+    private InboundOrder createInboundOrderFF(){
+        LocalDate date = LocalDate.of(2021,5,14);
+        return new InboundOrder("numberTest",date, createSectionFF());
+    }
+    private InboundOrder createInboundOrderRF(){
+        LocalDate date = LocalDate.of(2021,5,14);
+        return new InboundOrder("numberTest",date, createSectionRF());
     }
 
-    private Section createSection(){
+    private Section createSectionFS(){
         return new Section("sectionTest",State.FS,"testWHC",20,20,500);
     }
+    private Section createSectionFF(){
+        return new Section("sectionTest",State.FF,"testWHC",20,20,500);
+    }
+    private Section createSectionRF(){
+        return new Section("sectionTest",State.RF,"testWHC",20,20,500);
+    }
 
-    private List<Batch> createBatchList(){
-        Product product = createProduct();
+    private List<Batch> createBatchListFS(){
+        Product product = createProductFS();
         LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2021,5,14),LocalTime.of(1,1,1));
         LocalDate expirationDate = LocalDate.of(2021,7,14);
         LocalDate expirationDate1 = LocalDate.of(2021,7,13);
@@ -158,9 +215,41 @@ class BatchServiceTest {
         LocalDate date1 = LocalDate.of(2021,5,14);
         LocalDate date2 = LocalDate.of(2021,5,14);
         List<Batch> batchList = new ArrayList<>();
-        batchList.add(new Batch("0",product,(float)20,(float)20,expirationDate,date,dateTime,500,500,createInboundOrder()));
-        batchList.add(new Batch("1",product,(float)20,(float)20,expirationDate2,date1,dateTime,500,300,createInboundOrder()));
-        batchList.add(new Batch("2",product,(float)20,(float)20,expirationDate1,date2,dateTime,500,400,createInboundOrder()));
+        batchList.add(new Batch("0",product,(float)20,(float)20,expirationDate,date,dateTime,500,500, createInboundOrderFS()));
+        batchList.add(new Batch("1",product,(float)20,(float)20,expirationDate2,date1,dateTime,500,300, createInboundOrderFS()));
+        batchList.add(new Batch("2",product,(float)20,(float)20,expirationDate1,date2,dateTime,500,400, createInboundOrderFS()));
+        return batchList;
+    }
+
+    private List<Batch> createBatchListFF(){
+        Product product = createProductFF();
+        LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2021,5,14),LocalTime.of(1,1,1));
+        LocalDate expirationDate = LocalDate.of(2021,7,14);
+        LocalDate expirationDate1 = LocalDate.of(2021,7,13);
+        LocalDate expirationDate2 = LocalDate.of(2021,7,12);
+        LocalDate date = LocalDate.of(2021,5,14);
+        LocalDate date1 = LocalDate.of(2021,5,14);
+        LocalDate date2 = LocalDate.of(2021,5,14);
+        List<Batch> batchList = new ArrayList<>();
+        batchList.add(new Batch("0",product,(float)20,(float)20,expirationDate,date,dateTime,500,500, createInboundOrderFF()));
+        batchList.add(new Batch("1",product,(float)20,(float)20,expirationDate2,date1,dateTime,500,300, createInboundOrderFF()));
+        batchList.add(new Batch("2",product,(float)20,(float)20,expirationDate1,date2,dateTime,500,400, createInboundOrderFF()));
+        return batchList;
+    }
+
+    private List<Batch> createBatchListRF(){
+        Product product = createProductRF();
+        LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2021,5,14),LocalTime.of(1,1,1));
+        LocalDate expirationDate = LocalDate.of(2021,7,14);
+        LocalDate expirationDate1 = LocalDate.of(2021,7,13);
+        LocalDate expirationDate2 = LocalDate.of(2021,7,12);
+        LocalDate date = LocalDate.of(2021,5,14);
+        LocalDate date1 = LocalDate.of(2021,5,14);
+        LocalDate date2 = LocalDate.of(2021,5,14);
+        List<Batch> batchList = new ArrayList<>();
+        batchList.add(new Batch("0",product,(float)20,(float)20,expirationDate,date,dateTime,500,500, createInboundOrderRF()));
+        batchList.add(new Batch("1",product,(float)20,(float)20,expirationDate2,date1,dateTime,500,300, createInboundOrderRF()));
+        batchList.add(new Batch("2",product,(float)20,(float)20,expirationDate1,date2,dateTime,500,400, createInboundOrderRF()));
         return batchList;
     }
 

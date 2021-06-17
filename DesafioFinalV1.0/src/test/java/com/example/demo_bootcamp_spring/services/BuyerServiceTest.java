@@ -1,4 +1,4 @@
-package com.example.demo_bootcamp_spring.service;
+package com.example.demo_bootcamp_spring.services;
 
 import com.example.demo_bootcamp_spring.dtos.InboundOrderTransaction;
 import com.example.demo_bootcamp_spring.exceptions.NoRelatedWarehousesToProduct;

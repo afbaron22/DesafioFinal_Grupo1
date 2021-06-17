@@ -1,12 +1,10 @@
-package com.example.demo_bootcamp_spring.service;
+package com.example.demo_bootcamp_spring.services;
 
 import com.example.demo_bootcamp_spring.dtos.UserDto;
 import com.example.demo_bootcamp_spring.models.Account;
 import com.example.demo_bootcamp_spring.models.Warehouse;
 import com.example.demo_bootcamp_spring.repository.UserRepository;
 import com.example.demo_bootcamp_spring.repository.WarehouseRepository;
-import com.example.demo_bootcamp_spring.services.JwtUserDetailsService;
-import com.example.demo_bootcamp_spring.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
