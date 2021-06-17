@@ -114,16 +114,10 @@ public class OrdersService implements IOrderService {
                 .reduce(0,(subtotal, batch) -> subtotal + batch.getCurrentQuantity(), Integer::sum);
     }
 
-    private Orders orderDTOtoOrder(OrderDTO orderDTO){
-        //TODO hacer la lógica bien
-        return new Orders();
-    }
-
     public List<OrderProduct> checkAndGetOrderProduct(OrderDTO orderDTO){
 
         List<Double> prices = new ArrayList<>();
-        List<Product> products = new ArrayList<>();
-        List<String> errores = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
         List<OrderProduct> orderProductList = new ArrayList<>();
         int numberOfDays = 21;
         LocalDate date = LocalDate.now().plusDays(numberOfDays);
@@ -140,11 +134,11 @@ public class OrdersService implements IOrderService {
 
                 prices.add(repoProduct.getPrice() * orderProduct.getQuantity());
             } else {
-                errores.add(orderProduct.getProductId() + " has " + stockAvailable + " items available");
+                errors.add(orderProduct.getProductId() + " has " + stockAvailable + " items available");
             }
         });
-        if (errores.size() > 0) {
-            String errorProducts = errores.stream().reduce("", (acum, error) -> acum + error + "\n");
+        if (errors.size() > 0) {
+            String errorProducts = errors.stream().reduce("", (acum, error) -> acum + error + "\n");
             throw new ProductsOutOfStockException("the following products are not available: \n" + errorProducts);
 
         } return orderProductList;

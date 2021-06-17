@@ -44,12 +44,12 @@ public class ProductServiceTest {
 
     @BeforeEach
     void setup(){
-        Product product1 = new Product("1", "Bananas","Banaas Bananón", State.FS, 29.99);
-        Product product2 = new Product("2", "Peras","Peras frescas", State.FS, 40.23);
-        Product product3 = new Product("3", "Merluza","Merluza fresca empanada", FF, 100.75);
-        Product product4 = new Product("4", "Calamares","Calamares congelados separados por kilo", FF, 123.99);
-        Product product5 = new Product("5", "Leche","Leche parcialmente descremada Sancor", State.RF, 20.00);
-        Product product6 = new Product("6", "Yogurt","Yogurt griego La Serenísima", State.RF, 25.25);
+        product1 = new Product("1", "Bananas","Banaas Bananón", State.FS, 29.99);
+        product2 = new Product("2", "Peras","Peras frescas", State.FS, 40.23);
+        product3 = new Product("3", "Merluza","Merluza fresca empanada", FF, 100.75);
+        product4 = new Product("4", "Calamares","Calamares congelados separados por kilo", FF, 123.99);
+        product5 = new Product("5", "Leche","Leche parcialmente descremada Sancor", State.RF, 20.00);
+        product6 = new Product("6", "Yogurt","Yogurt griego La Serenísima", State.RF, 25.25);
 
         productRepoMOCK = Arrays.asList(product1,product2,product3,product4,product5, product6);
     }
