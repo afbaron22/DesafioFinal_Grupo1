@@ -1,16 +1,14 @@
 package com.example.demo_bootcamp_spring.controller;
-import com.example.demo_bootcamp_spring.dtos.BatchStockProduct;
-import com.example.demo_bootcamp_spring.dtos.BatchStockProductSearch;
-import com.example.demo_bootcamp_spring.dtos.SectionDTO;
+import com.example.demo_bootcamp_spring.dtos.*;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import com.example.demo_bootcamp_spring.services.Batch.BatchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.example.demo_bootcamp_spring.dtos.SearchedWarehouseProducts;
 import com.example.demo_bootcamp_spring.services.Batch.IBatchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,7 +45,7 @@ class BatchControllerTest {
     private SectionRepository sectionRepository;
 
     @MockBean
-    private IBatchService batchService;
+    private BatchService batchService;
 
     @Test
     public void shouldGetProductFromBatches() throws Exception {
@@ -82,6 +81,7 @@ class BatchControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(new ObjectMapper().writeValueAsString(warehouseProducts)));
     }
+
 
     private static ObjectMapper makeMapper() {
         ObjectMapper mapper = new ObjectMapper();
