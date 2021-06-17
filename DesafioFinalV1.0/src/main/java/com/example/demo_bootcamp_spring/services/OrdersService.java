@@ -102,7 +102,6 @@ public class OrdersService implements IOrderService {
         //orderToUpdate.setOrderProducts();
         orderToUpdate = ordersRepository.save(orderToUpdate);
 
-
     }
 
     private int productStock(String prodId, LocalDate dueDate){
@@ -115,7 +114,6 @@ public class OrdersService implements IOrderService {
     }
 
     public List<OrderProduct> checkAndGetOrderProduct(OrderDTO orderDTO){
-
         List<Double> prices = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         List<OrderProduct> orderProductList = new ArrayList<>();
@@ -142,20 +140,6 @@ public class OrdersService implements IOrderService {
             throw new ProductsOutOfStockException("the following products are not available: \n" + errorProducts);
 
         } return orderProductList;
-    }
-
-
-
-    public void saveBatch(InboundOrderDTO inboundOrderDTO){
-
-       /* @NotNull(message = "Order Number is required")
-        private Integer orderNumber;
-        @NotNull(message = "Order Date  is required")
-        private LocalDate orderDate;
-        @Valid
-        private SectionDTO section;
-        @Valid
-        private List<BatchDTO> batchStock;*/
     }
 
 }

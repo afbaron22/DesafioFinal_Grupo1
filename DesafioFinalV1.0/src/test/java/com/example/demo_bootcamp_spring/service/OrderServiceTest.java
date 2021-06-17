@@ -1,6 +1,11 @@
 package com.example.demo_bootcamp_spring.service;
 
 import com.example.demo_bootcamp_spring.dtos.OrderDTO;
+import com.example.demo_bootcamp_spring.dtos.OrderDetailDTO;
+import com.example.demo_bootcamp_spring.dtos.OrderProductDetailDTO;
+import com.example.demo_bootcamp_spring.dtos.ProductDTO;
+import com.example.demo_bootcamp_spring.exceptions.OrderNotFoundException;
+import com.example.demo_bootcamp_spring.exceptions.ProductsOutOfStockException;
 import com.example.demo_bootcamp_spring.models.*;
 import com.example.demo_bootcamp_spring.repository.BatchRepository;
 import com.example.demo_bootcamp_spring.repository.OrdersRepository;
@@ -15,14 +20,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.example.demo_bootcamp_spring.models.State.FF;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class OrderServiceTest {
-
     private OrderDTO shoudPassOrder;
     private OrderDTO shoudRejectOrder;
     private Product product1;
@@ -46,8 +53,10 @@ public class OrderServiceTest {
 
     @Mock
     private OrdersRepository ordersRepository;
+
     @Mock
     private ProductsRepository productsRepository;
+
     @Mock
     private BatchRepository batchRepository;
 
@@ -81,6 +90,93 @@ public class OrderServiceTest {
 
 
     @Test
-    public void shouldGetAllProducts() {
+    public void shouldRegisterAnOrder() {
+        when(productsRepository.findById(any(String.class))).thenReturn(Optional.of(product1));
+        when(ordersRepository.save(any(Orders.class))).thenReturn(new Orders());
+        when(batchRepository.findByProductIdAndDueDate(any(String.class), any(LocalDate.class)))
+                .thenReturn(Arrays.asList(batch1));
+
+        OrderDTO order = getMockOrderDTOWithProductOne();
+        ProductDTO productDTO = order.getProducts().get(0);
+
+        double response = ordersService.registerOrder(order);
+        assertEquals(response, product1.getPrice() * productDTO.getQuantity());
     }
+
+    @Test
+    public void shouldReturnAnOrderDetail() {
+        int orderId = 1;
+        OrderProductDetailDTO orderProductDetail = new OrderProductDetailDTO();
+
+        when(ordersRepository.getProductsInOrder(any(Integer.class)))
+                .thenReturn(Optional.of(Arrays.asList(orderProductDetail)));
+
+        OrderDetailDTO response = ordersService.getOrderDetail(orderId);
+        assertEquals(response.getOrderId(), orderId);
+    }
+
+    @Test
+    public void givenBadIdShouldThrowsExceptionAndNotReturnOrderDetail() {
+        int orderId = 1;
+        when(ordersRepository.getProductsInOrder(any(Integer.class)))
+                .thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> ordersService.getOrderDetail(orderId));
+    }
+
+    @Test
+    public void shouldUpdateOrder() {
+        Orders order = new Orders();
+        order.setOrderProducts(new HashSet<>());
+
+        when(productsRepository.findById(any(String.class))).thenReturn(Optional.of(product1));
+        when(ordersRepository.findById(any(Integer.class))).thenReturn(Optional.of(order));
+        when(batchRepository.findByProductIdAndDueDate(any(String.class), any(LocalDate.class)))
+                .thenReturn(Arrays.asList(batch1));
+
+        OrderDTO orderDTO = getMockOrderDTOWithProductOne();
+        assertDoesNotThrow(() -> ordersService.updateOrder(1, orderDTO));
+    }
+
+    @Test
+    public void givenBadIdshouldNotUpdateOrderAndThrowsException() {
+        when(productsRepository.findById(any(String.class))).thenReturn(Optional.of(product1));
+        when(ordersRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        when(batchRepository.findByProductIdAndDueDate(any(String.class), any(LocalDate.class)))
+                .thenReturn(Arrays.asList(batch1));
+
+        OrderDTO orderDTO = getMockOrderDTOWithProductOne();
+        assertThrows(OrderNotFoundException.class, () -> ordersService.updateOrder(1, orderDTO));
+    }
+
+
+    @Test
+    public void shouldThrowsExceptionGivenZeroStock() {
+        when(productsRepository.findById(any(String.class))).thenReturn(Optional.of(product1));
+        when(ordersRepository.save(any(Orders.class))).thenReturn(new Orders());
+        when(batchRepository.findByProductIdAndDueDate(any(String.class), any(LocalDate.class)))
+                .thenReturn(new ArrayList<>());
+
+        OrderDTO order = getMockOrderDTOWithProductOne();
+
+        assertThrows(ProductsOutOfStockException.class, () -> ordersService.checkAndGetOrderProduct(order));
+    }
+
+
+    private OrderDTO getMockOrderDTOWithProductOne() {
+        OrderDTO order = new OrderDTO();
+
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setProductId("1");
+        productDTO.setQuantity(1);
+
+        List<ProductDTO> products = new ArrayList<>();
+        products.add(productDTO);
+        order.setProducts(products);
+        order.setDate(LocalDate.now());
+
+        return order;
+    }
+
+
 }
