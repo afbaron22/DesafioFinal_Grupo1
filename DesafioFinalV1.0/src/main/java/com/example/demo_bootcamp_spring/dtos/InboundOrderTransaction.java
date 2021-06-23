@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -13,5 +14,5 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class InboundOrderTransaction {
     @NotNull(message = "Initial Quantity is required")
-    private InboundOrderDTO inboundOrder;
+    private @Valid InboundOrderDTO inboundOrder;
 }

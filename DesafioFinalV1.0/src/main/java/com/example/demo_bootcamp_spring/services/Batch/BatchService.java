@@ -1,17 +1,11 @@
 package com.example.demo_bootcamp_spring.services.Batch;
-
-
 import com.example.demo_bootcamp_spring.dtos.*;
 import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.models.Batch;
 import com.example.demo_bootcamp_spring.models.InboundOrder;
 import com.example.demo_bootcamp_spring.models.Section;
-import com.example.demo_bootcamp_spring.repository.BatchRepository;
-import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
-import com.example.demo_bootcamp_spring.repository.ProductsRepository;
-import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import com.example.demo_bootcamp_spring.repository.*;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +17,7 @@ public class BatchService implements IBatchService {
     SectionRepository sectionRepository;
     BatchRepository batchRepository;
     ProductsRepository productsRepository;
+    UserRepository userRepository;
     private LocalDate currentDate = LocalDate.now();
     /**CONSTRUCTOR
      * Contructor encargado de inyectar las dependencias de los repositorios.
@@ -31,11 +26,17 @@ public class BatchService implements IBatchService {
      * @param batchRepository
      * @param productsRepository
      */
-    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository) {
+    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository,UserRepository userRepository) {
         this.inboundOrderRepository = inboundOrderRepository;
         this.sectionRepository      = sectionRepository;
         this.batchRepository        = batchRepository;
         this.productsRepository     = productsRepository;
+        this.userRepository         = userRepository;
+    }
+
+    public Integer validate(String userName){
+        var user = userRepository.findByUsername(userName);
+        return user.getWarehouse().getIdWarehouse();
     }
     /**MÉTODO SAVEBATCH
      *Este método se encarga de guardar en persistencia un InboundOrderTransaction, este es un objecto que el
@@ -47,7 +48,9 @@ public class BatchService implements IBatchService {
      * @return
      */
     //------------------------------------------MÉTODO SAVEBATCH--------------------------------------------------
+
     public BatchStock saveBatch(InboundOrderTransaction inboundOrder){
+
         var inboundOrderDTO = inboundOrder.getInboundOrder();
         if(existInboundOrder(inboundOrderDTO))
             throw new ExistingInboundOrderId();
@@ -123,6 +126,55 @@ public class BatchService implements IBatchService {
         return new SearchedWarehouseProducts(idProducto,warehouseList);
     }
 
+    /**
+     * Este método se encarga de revisar en un warehouse asociado los productos que van a vencer en un determiando
+     * rango de tiempo proporcionado por el usuario. El método consiste es delimitar dos fechas en las cuales
+     * puede vencer un producto y traer el bache asociado a este.
+     * @param idWarehouse
+     * @param days
+     * @return
+     */
+    //---------------------------------------MÉTODO GETBATCHESINWAREHOUSEBYDUEDATE--------------------------------------------------
+    public BatchStockWareHouse getBatchesInWarehouseByDueDate(Integer idWarehouse, Integer days,String category,String order) {
+        var limitDate =  currentDate.plusDays(days);
+        var todayDate = currentDate.minusDays(1);
+        var list = processListOrderBy(processListCategories(idWarehouse,category),order);
+        var listBatch = list.stream().map(x->{
+           if(x.getDueDate().isBefore(limitDate) && x.getDueDate().isAfter(todayDate)){
+               Map<String,Object> batchStock = new HashMap<>();
+               batchStock.put("batchNumber",x.getBatchNumber());
+               batchStock.put("productId",x.getProduct().getProductId());
+               batchStock.put("dueDate",x.getDueDate());
+               batchStock.put("quantity",x.getCurrentQuantity());
+               return batchStock; }
+           return null; }).collect(Collectors.toList());
+        while (listBatch.remove(null)) {}
+        return new BatchStockWareHouse(listBatch);
+    }
+    private  List<Batch> processListOrderBy(List<Batch> list,String order){
+        if(order.equals("desc"))
+            list.sort(Comparator.comparing(Batch::getDueDate).reversed());
+        return list;
+    }
+
+    private List<Batch> processListCategories(Integer idWarehouse, String category){
+        var list= batchRepository.findProductDueDate(String.valueOf(idWarehouse)).orElseThrow(()-> new NotFoundProductsWithinGivenRange());
+        list.sort(Comparator.comparing(Batch::getDueDate));
+        if(category.equals("FF")) {
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            return list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==2).collect(Collectors.toList());
+        }
+        else if(category.equals("RF")){
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==1).collect(Collectors.toList());
+        }
+        else if(category.equals("FS")){
+            Collections.sort(list, Comparator.comparing(Batch::getDueDate));
+            list.stream().filter(x->x.getInboundOrder().getSection().getState().ordinal()==0).collect(Collectors.toList());
+        }
+        return  list;
+    }
+
     /**MÉTODO PROCESSLIST
      * Este método se encarga de procesar la lista de baches asociadas a un producto , mediante un stream, se filtran
      * los productos que no esten vencidos. Este método recibe dos parametros , la lista a procesar y el parametro de
@@ -134,7 +186,7 @@ public class BatchService implements IBatchService {
      */
     //---------------------------------------MÉTODO PROCESSLIST--------------------------------------------------
     private List<BatchStockProduct> processList(List<Batch> list, String ordBy){
-        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate)) return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
+        var listFound = list.stream().map(x-> { if(!x.getDueDate().isBefore(currentDate) && x.getDueDate().isAfter(currentDate.plusWeeks(3))) return new BatchStockProduct(x.getBatchNumber(),x.getCurrentQuantity(),x.getDueDate());
             return null;}).collect(Collectors.toList());
         while (listFound.remove(null)) {}
         if(ordBy.equals("L"))

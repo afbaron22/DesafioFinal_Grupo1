@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,12 +17,12 @@ import java.util.List;
 @Data
 public class InboundOrderDTO {
 
-    @NotNull(message = "Order Number is required")
+    @NotBlank(message = "Order Number is required")
     private String orderNumber;
     @NotNull(message = "Order Date  is required")
     private LocalDate orderDate;
-    @Valid
-    private SectionDTO section;
+
+    private @Valid SectionDTO section;
 
     private List<@Valid BatchDTO> batchStock;
 

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -26,25 +27,7 @@ public class Orders {
     private Integer orderId;
     private String user;
     private String createdAt;
-
-  /*  @JoinTable(
-            name = "rel_order_products",
-            joinColumns = @JoinColumn(name = "FK_ORDER", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="FK_PRODUCT", nullable = false)
-    )
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Product> products*/;
-
-    private InetAddress getUserAdd() throws IOException {
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress("google.com", 80));
-        return socket.getLocalAddress();
-    }
-
-    private String getDate(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        return dtf.format(now).toString();
-
-    }
+    private OrderStatus orderStatus;
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderProduct> orderProducts;
 }

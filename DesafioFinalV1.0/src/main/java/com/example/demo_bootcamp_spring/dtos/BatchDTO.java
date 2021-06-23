@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,17 +25,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BatchDTO {
 
-    @NotNull(message = "Batch Number is required")
+    @NotBlank(message = "Batch Number is required")
     private String batchNumber;
 
     @NotBlank(message = "Product Id cant be empty")
-    @Size(min = 3, max = 45, message = "The length of Product Id must be between 3 and 45 characters")
     private String productId;
 
-    @NotNull(message = "Current Temperatura is required")
+    @NotNull(message = "Current Temperature is required")
     private Float currentTemperature;
 
-    @NotNull(message = "Minimum Temperatura is required")
+    @NotNull(message = "Minimum Temperature is required")
     private Float minimumTemperature;
 
     @NotNull(message = "Initial Quantity is required")
