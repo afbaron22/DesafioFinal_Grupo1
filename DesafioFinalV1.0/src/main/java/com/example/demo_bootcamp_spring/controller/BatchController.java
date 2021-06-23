@@ -43,5 +43,10 @@ public class BatchController {
 
         return new ResponseEntity(batchService.getProductFromWarehouses(String.valueOf(querytype)), HttpStatus.CREATED);
     }
+    @GetMapping(path = "/warehouseFewerItems")
+    public ResponseEntity<?> getFewerItemsWarehouse(@RequestHeader("Authorization") String token){
+
+        return new ResponseEntity(batchService.checkWarehouseFewerItems(), HttpStatus.OK);
+    }
 }
 

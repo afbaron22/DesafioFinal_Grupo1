@@ -6,10 +6,8 @@ import com.example.demo_bootcamp_spring.exceptions.*;
 import com.example.demo_bootcamp_spring.models.Batch;
 import com.example.demo_bootcamp_spring.models.InboundOrder;
 import com.example.demo_bootcamp_spring.models.Section;
-import com.example.demo_bootcamp_spring.repository.BatchRepository;
-import com.example.demo_bootcamp_spring.repository.InboundOrderRepository;
-import com.example.demo_bootcamp_spring.repository.ProductsRepository;
-import com.example.demo_bootcamp_spring.repository.SectionRepository;
+import com.example.demo_bootcamp_spring.models.Warehouse;
+import com.example.demo_bootcamp_spring.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +21,7 @@ public class BatchService implements IBatchService {
     SectionRepository sectionRepository;
     BatchRepository batchRepository;
     ProductsRepository productsRepository;
+    WarehouseRepository warehouseRepository;
     private LocalDate currentDate = LocalDate.now();
     /**CONSTRUCTOR
      * Contructor encargado de inyectar las dependencias de los repositorios.
@@ -31,11 +30,12 @@ public class BatchService implements IBatchService {
      * @param batchRepository
      * @param productsRepository
      */
-    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository) {
+    public BatchService(InboundOrderRepository inboundOrderRepository, SectionRepository sectionRepository, BatchRepository batchRepository, ProductsRepository productsRepository, WarehouseRepository warehouseRepository) {
         this.inboundOrderRepository = inboundOrderRepository;
         this.sectionRepository      = sectionRepository;
         this.batchRepository        = batchRepository;
         this.productsRepository     = productsRepository;
+        this.warehouseRepository    = warehouseRepository;
     }
     /**MÉTODO SAVEBATCH
      *Este método se encarga de guardar en persistencia un InboundOrderTransaction, este es un objecto que el
@@ -121,6 +121,11 @@ public class BatchService implements IBatchService {
             warehouses.put("totalQuantity",x[1].toString());
             return warehouses; }).collect(Collectors.toList());
         return new SearchedWarehouseProducts(idProducto,warehouseList);
+    }
+
+    public Warehouse checkWarehouseFewerItems(){
+        var idWareHouse = batchRepository.getFewerItemsWarehouse().orElseThrow();
+        return warehouseRepository.findById(idWareHouse).get();
     }
 
     /**MÉTODO PROCESSLIST
